@@ -13,5 +13,21 @@
         <%- include('../partials/nav'); %>
     </header>
     Registration Page
+    <form action="/sign-up" method="post">
+        <h2>Sign Up</h2>
+        <div class="input-field">
+            <input type="text" name="first" id="first" placeholder="Enter First Name">
+        </div>
+        <div class="input-field">
+            <input type="text" name="last" id="last" placeholder="Enter Last Name">
+        </div>
+        <div class="input-field">
+            <input type="text" name="user" id="user" placeholder="Enter Username">
+        </div>
+        <div class="input-field">
+            <input type="password" name="pass" id="pass" placeholder="Enter Password">
+        </div>
+        <input type="submit" value="Sign Up">
+    </form>
 </body>
 </html>
