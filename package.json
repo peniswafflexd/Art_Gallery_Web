@@ -22,7 +22,6 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "mongodb": "^4.1.2",
-    "nodejs-hot-reload": "^0.1.2",
-    "scrypt-js": "^3.0.1"
+    "nodejs-hot-reload": "^0.1.2"
   }
 }

@@ -13,10 +13,5 @@
         <%- include('../partials/nav'); %>
     </header>
     Index Page
-    <ul>
-        <% for (var i = 0; i < artwork.length ; i++) { %>
-            <li> <a class="nav-link" href="/art/<%-artwork[i]._id%>"> <%= JSON.stringify(artwork[i]) %> </a> </li>
-        <% } %>
-    </ul>
 </body>
 </html>
