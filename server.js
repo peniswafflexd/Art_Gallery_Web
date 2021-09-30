@@ -50,8 +50,13 @@ const populateArtworkMap = async (data) => {
         artworkMap.set(artwork_id, art)
     })
 }
+
+/**
+ * returns validation handler array for a method
+ * @param method - String for which method you want to validate for
+ * @returns validation check
+ */
 const validate = (method) => {
-    console.log("validating")
     switch (method) {
         case 'updateArtwork': {
             return [
@@ -86,7 +91,10 @@ const validate = (method) => {
     }
 }
 
-//this function gets run on every request
+/**
+ * this function gets run on every request
+ * it sets a global variable to the users userid to check if they're logged in
+ */
 router.use((req, res, next) => {
     app.locals.user = {ID: req.session.userid}
     next();
@@ -98,33 +106,12 @@ router.use((req, res, next) => {
  * update the local map when changes are made to the database
  */
 router.get('', (req, res) => {
-    get_all_art().then(data => {
-        app.locals.artwork = data
-        populateArtworkMap(data)
-        res.render('pages/index');
-    })
+    res.render('pages/index');
 });
 
-router.get('/sign-up', (req, res) => {
-    res.render('pages/registration');
-});
-
-router.get('/cart', (req, res) => {
-    res.render('pages/cart');
-});
-
-router.get('/donate', (req, res) => {
-    res.render('pages/donate');
-});
-
-router.get('/login', (req, res) => {
-    res.render('pages/login');
-});
-
-router.get('/order', (req, res) => {
-    res.render('pages/order');
-});
-
+/**
+ * creates and adds a piece of artwork to the database
+ */
 router.post("/art",validate("createArtwork") ,(req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
@@ -140,6 +127,9 @@ router.post("/art",validate("createArtwork") ,(req, res) => {
     })
 });
 
+/**
+ * deletes the artwork specified by the artwork id
+ */
 router.delete("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
     if(!artworkMap.has(artwork_id)) return res.send("Artwork ID doesn't exist");
@@ -154,26 +144,17 @@ router.delete("/art/:artwork_id", (req, res) => {
 })
 
 /**
- * Returns page of the artwork from the given artwork ID in the
- * URL
+ * Updates the artwork specified by the artwork id. Takes
+ * four optional parameters
  */
-router.get("/art/:artwork_id", (req, res) => {
-    let artwork_id = req.params.artwork_id
-    let currentArtwork = artworkMap.get(artwork_id);
-    if (currentArtwork) {
-        res.render("pages/artwork", {currentArtwork});
-    } else {
-        res.send("This is not a valid artwork ID");
-    }
-})
-
 app.put("/art/:artwork_id", validate("updateArtwork"), (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
         res.status(422).json({errors: errors.array()});
         return;
     }
-    const {artwork_id, author, media, desc, price} = req.body;
+    const artwork_id = req.params.artwork_id
+    const {author, media, desc, price} = req.body;
     let update = {}
     if (price) update.price = price
     if (author) update.author = author
@@ -187,6 +168,25 @@ app.put("/art/:artwork_id", validate("updateArtwork"), (req, res) => {
     })
 })
 
+/**
+ * Returns page of the artwork from the given artwork ID in the
+ * URL
+ */
+router.get("/art/:artwork_id", (req, res) => {
+    const artwork_id = req.params.artwork_id
+    let currentArtwork = artworkMap.get(artwork_id);
+    if (currentArtwork) {
+        res.render("pages/artwork", {currentArtwork});
+    } else {
+        res.send("This is not a valid artwork ID");
+    }
+})
+
+
+
+/**
+ * Logs a user in, and redirects them to the index page
+ */
 router.post("/login", validate('loginUser'), (req, res) => {
         const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
         if (!errors.isEmpty()) {
@@ -208,6 +208,10 @@ router.post("/login", validate('loginUser'), (req, res) => {
             })
     })
 
+/**
+ * creates a new user document and logs the user in before
+ * redirecting them to the index page
+ */
 router.post('/sign-up',validate('createUser'), (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
@@ -231,8 +235,32 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
+router.get('/sign-up', (req, res) => {
+    res.render('pages/registration');
+});
+
+router.get('/cart', (req, res) => {
+    res.render('pages/cart');
+});
+
+router.get('/donate', (req, res) => {
+    res.render('pages/donate');
+});
+
+router.get('/login', (req, res) => {
+    res.render('pages/login');
+});
+
+router.get('/order', (req, res) => {
+    res.render('pages/order');
+});
+
 
 app.listen(8080, () => {
+    get_all_art().then(data => {
+        app.locals.artwork = data
+        populateArtworkMap(data)
+    })
     console.log('Server is listening on port 8080');
 });
 
