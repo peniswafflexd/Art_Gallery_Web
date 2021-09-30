@@ -1,5 +1,4 @@
-
-const { MongoClient } = require("mongodb");
+const {MongoClient} = require("mongodb");
 const mongo = require('mongodb');
 const scrypt = require('scrypt-js');
 
@@ -27,20 +26,20 @@ const salt = "AllYourBaseRBelongToUs";
 const N = 1024, r = 8, p = 1;
 const salt_buffer = Buffer.from(salt, 'utf-8');
 const dkLen = 32;
-var hashed_password;
+let hashed_password;
 
 /*Salts and hashes a string into a secure form using the scrypt algorithm. Returns
 the salted and hashed password as a string.
 
 password: String to be converted into a hash
 */
-function hash(password){
+function hash(password) {
 
-  password_buffer = Buffer.from(password, 'utf-8');
-  hashed_buffer = scrypt.syncScrypt(password_buffer, salt_buffer, N, r, p, dkLen);
-  hashed_password = new TextDecoder().decode(hashed_buffer);
+    let password_buffer = Buffer.from(password, 'utf-8');
+    let hashed_buffer = scrypt.syncScrypt(password_buffer, salt_buffer, N, r, p, dkLen);
+    hashed_password = new TextDecoder().decode(hashed_buffer);
 
-  return(hashed_password);
+    return (hashed_password);
 
 }
 
@@ -51,20 +50,20 @@ any document from any collection.
 ID: String form of the ID of the document being searched for
 collection: String, name of the collection the document is in
 */
-async function get(id, collection, client = admin){
+async function get(id, collection, client = admin) {
 
-  try {
+    try {
 
-    await client.connect();
+        await client.connect();
 
-    object_id = new mongo.ObjectID(id);
-    item = await client.db('NWEN304').collection(collection).findOne({_id: object_id});
+        let object_id = new mongo.ObjectID(id);
+        let item = await client.db('NWEN304').collection(collection).findOne({_id: object_id});
 
-    return item;
+        return item;
 
-  } finally {
-    await client.close();
-  }
+    } finally {
+        await client.close();
+    }
 
 }
 
@@ -73,11 +72,11 @@ does not store document ID's as strings.
 
 document: JSON document from a MongoDB collection
 */
-function get_ID(document){
-  object_id = document._id;
-  id = object_id.toString();
+function get_ID(document) {
+    let object_id = document._id;
+    let id = object_id.toString();
 
-  return id;
+    return id;
 }
 
 /*Generic query function, returns either a single json objectt that matches the
@@ -93,25 +92,25 @@ single: Boolean, whether the function returns a single element or an array of
 elements. Single search is faster, and should be used when only a single entry
 is expected to be in the collection that matches the query.
 */
-async function query(collection, query, single = false, client = admin){
+async function query(collection, query, single = false, client = admin) {
 
-  try {
+    try {
 
-    await client.connect();
+        await client.connect();
 
-    var result;
+        let result;
 
-    if (single) {
-      result = await client.db("NWEN304").collection(collection).findOne(query);
-    } else (
-      result = await client.db("NWEN304").collection(collection).find(query).toArray()
-    )
+        if (single) {
+            result = await client.db("NWEN304").collection(collection).findOne(query);
+        } else (
+            result = await client.db("NWEN304").collection(collection).find(query).toArray()
+        )
 
-    return(result);
+        return (result);
 
-  } finally {
-    await client.close();
-  }
+    } finally {
+        await client.close();
+    }
 
 }
 
@@ -128,19 +127,19 @@ update: Object key-pair, new value for the document
 */
 async function update_document(id, collection, update, client = admin) {
 
-  object_id = new mongo.ObjectID(id);
-  query = {
-    _id: object_id
-  };
+    let object_id = new mongo.ObjectID(id);
+    query = {
+        _id: object_id
+    };
 
-  try {
+    try {
 
-    await client.connect();
-    await client.db("NWEN304").collection(collection).updateOne(query, { $set: update});
+        await client.connect();
+        await client.db("NWEN304").collection(collection).updateOne(query, {$set: update});
 
-  } finally {
-    await client.close();
-  }
+    } finally {
+        await client.close();
+    }
 
 }
 
@@ -155,33 +154,33 @@ l_name: String, the users last name
 admin: Boolean, determines whether the account is to be an admin account,
 or a regular account
 */
-async function add_user(username, password, f_name, l_name, admin = false){
+async function add_user(username, password, f_name, l_name, admin = false) {
 
-  try {
-    await login_admin.connect();
+    try {
+        await login_admin.connect();
 
-    in_database = await login_admin.db('NWEN304').collection('users').findOne({username: username});
-    if(in_database){
-      throw 'username_taken';
-    } else {
+        let in_database = await login_admin.db('NWEN304').collection('users').findOne({username: username});
+        if (in_database) {
+            throw 'username_taken';
+        } else {
 
-      hashed_password = hash(password);
+            hashed_password = hash(password);
 
-      new_user = {
-        first_name: f_name,
-        last_name: l_name,
-        username: username,
-        password: hashed_password,
-        admin: admin
-      };
+            let new_user = {
+                first_name: f_name,
+                last_name: l_name,
+                username: username,
+                password: hashed_password,
+                admin: admin
+            };
 
-      await login_admin.db('NWEN304').collection('users').insertOne(new_user);
+            await login_admin.db('NWEN304').collection('users').insertOne(new_user);
+            return new_user;
+        }
 
+    } finally {
+        await login_admin.close();
     }
-
-  } finally {
-    await login_admin.close();
-  }
 
 }
 
@@ -195,32 +194,32 @@ and the given password do not match
 username: String, the users username
 password: String, the users password
 */
-async function user_login(username, password){
+async function user_login(username, password) {
 
-  try {
+    try {
 
-    await login_admin.connect();
+        await login_admin.connect();
 
-    account = await login_admin.db('NWEN304').collection('users').findOne({username: username});
+        let account = await login_admin.db('NWEN304').collection('users').findOne({username: username});
 
-    if(account){
+        if (account) {
 
-      test_password = hash(password);
-      if (test_password == account.password) {
+            let test_password = hash(password);
+            if (test_password == account.password) {
 
-        return account;
+                return account;
 
-      } else {
-        throw 'passwords_do_not_match';
-      }
+            } else {
+                throw 'passwords_do_not_match';
+            }
 
-    } else {
-      throw 'username_not_found'
+        } else {
+            throw 'username_not_found'
+        }
+
+    } finally {
+        await login_admin.close();
     }
-
-  } finally {
-    await login_admin.close();
-  }
 
 }
 
@@ -232,25 +231,25 @@ url: String, A url to the artwork, used to display the artwork on the site
 price: Number, the price of the artwork, should be to two decimal places
 */
 async function add_art(author, description, url, price) {
-  new_art = {
-    author: author,
-    description: description,
-    media_url: url,
-    price: price,
-    purchased: false
-  };
+    let new_art = {
+        author: author,
+        description: description,
+        media_url: url,
+        price: price,
+        purchased: false
+    };
 
-  try {
+    try {
 
-    await art_admin.connect();
+        await art_admin.connect();
 
-    artwork = await art_admin.db("NWEN304").collection("artworks").insertOne(new_art);
+        let artwork = await art_admin.db("NWEN304").collection("artworks").insertOne(new_art);
 
-    return (artwork);
+        return (artwork);
 
-  } finally {
-    await art_admin.close();
-  }
+    } finally {
+        await art_admin.close();
+    }
 
 }
 
@@ -261,29 +260,29 @@ artwork in the collection.
 
 artwork_ids: array of Strings, the id's of the artworks to be checked.
 */
-async function check_artworks(artwork_ids, client = admin){
+async function check_artworks(artwork_ids, client = admin) {
 
-  price = 0.0;
+    let price = 0.0;
 
-  for (id in artwork_ids) {
+    for (let id in artwork_ids) {
 
-    art = await get(artwork_ids[id], "artworks", client);
+        let art = await get(artwork_ids[id], "artworks", client);
 
-    if (!art) {
-      throw 'art_' + artwork_ids[id] + '_not_found';
+        if (!art) {
+            throw 'art_' + artwork_ids[id] + '_not_found';
+        }
+
+        if (art.purchased) {
+            throw 'art_' + artwork_ids[id] + '_not_available_for_purchase';
+        }
+
+        price = price + art.price;
+
     }
 
-    if (art.purchased) {
-      throw 'art_' + artwork_ids[id] + '_not_available_for_purchase';
-    }
+    price = price.toFixed(2);
 
-    price = price + art.price;
-
-  }
-
-  price = price.toFixed(2);
-
-  return (price);
+    return (price);
 
 }
 
@@ -300,36 +299,36 @@ NOTE: Create companion function that removes artworks once an order is complete,
 OR add "purchased / available" flag to artworks that are ordered, so cant be ordered
 twice.
 */
-async function add_order(user_id, artwork_ids){
+async function add_order(user_id, artwork_ids) {
 
-  try {
+    try {
 
-    user = await get(user_id, "users", purchase_admin);
+        let user = await get(user_id, "users", purchase_admin);
 
-    if (!user) {
-      throw 'user_not_found';
+        if (!user) {
+            throw 'user_not_found';
+        }
+
+        //artworks have probably already been checked by this point but it's safer to check again
+        let price = await check_artworks(artwork_ids, purchase_admin);
+
+        let new_order = {
+            user_id: user_id,
+            artwork_id: artwork_ids,
+            price: price
+        };
+
+        for (let id in artwork_ids) {
+            await update_document(artwork_ids[id], "artworks", {purchased: true}, purchase_admin);
+        }
+
+        await purchase_admin.connect();
+
+        await purchase_admin.db("NWEN304").collection("orders").insertOne(new_order);
+
+    } finally {
+        await purchase_admin.close();
     }
-
-    //artworks have probably already been checked by this point but it's safer to check again
-    price = await check_artworks(artwork_ids, purchase_admin);
-
-    new_order = {
-      user_id: user_id,
-      artwork_id: artwork_ids,
-      price: price
-    };
-
-    for (id in artwork_ids){
-      await update_document(artwork_ids[id], "artworks", {purchased: true}, purchase_admin);
-    }
-
-    await purchase_admin.connect();
-
-    await purchase_admin.db("NWEN304").collection("orders").insertOne(new_order);
-
-  } finally {
-    await purchase_admin.close();
-  }
 
 }
 
@@ -346,31 +345,31 @@ description: String, a description of the donated artwork
 url: String, A url to the donated artwork
 price: Number, the price of the donated artwork
 */
-async function add_donation(user_id, author, description, url, price){
+async function add_donation(user_id, author, description, url, price) {
 
-  try {
+    try {
 
-    user = await get(user_id, "users", art_admin);
+        let user = await get(user_id, "users", art_admin);
 
-    if (!user) {
-      throw 'user_not_found';
+        if (!user) {
+            throw 'user_not_found';
+        }
+
+        let artwork = await add_art(author, description, url, price);
+        let artwork_id = artwork.insertedId.toString();
+
+        let new_donation = {
+            user_id: user_id,
+            artwork_id: artwork_id
+        };
+
+        await art_admin.connect();
+
+        await art_admin.db("NWEN304").collection("donations").insertOne(new_donation);
+
+    } finally {
+        await art_admin.close();
     }
-
-    artwork = await add_art(author, description, url, price);
-    artwork_id = artwork.insertedId.toString();
-
-    new_donation = {
-      user_id: user_id,
-      artwork_id: artwork_id
-    };
-
-    await art_admin.connect();
-
-    await art_admin.db("NWEN304").collection("donations").insertOne(new_donation);
-
-  } finally {
-    await art_admin.close();
-  }
 
 }
 
@@ -378,33 +377,33 @@ async function add_donation(user_id, author, description, url, price){
 
 user_id: String form of the ID of the user to be removed
 */
-async function remove_user(user_id){
+async function remove_user(user_id) {
 
-  try {
+    try {
 
-    query = {
-      user_id: user_id
+        query = {
+            user_id: user_id
+        }
+
+        await art_admin.connect();
+        await art_admin.db("NWEN304").collection("donations").deleteMany(query);
+
+        await purchase_admin.connect();
+        await purchase_admin.db("NWEN304").collection("orders").deleteMany(query);
+
+        let object_id = new mongo.ObjectID(user_id);
+        let user_query = {
+            _id: object_id
+        }
+
+        await login_admin.connect();
+        await login_admin.db("NWEN304").collection("users").deleteOne(user_query);
+
+    } finally {
+        await art_admin.close();
+        await purchase_admin.close();
+        await login_admin.close();
     }
-
-    await art_admin.connect();
-    await art_admin.db("NWEN304").collection("donations").deleteMany(query);
-
-    await purchase_admin.connect();
-    await purchase_admin.db("NWEN304").collection("orders").deleteMany(query);
-
-    object_id = new mongo.ObjectID(user_id);
-    user_query = {
-      _id: object_id
-    }
-
-    await login_admin.connect();
-    await login_admin.db("NWEN304").collection("users").deleteOne(user_query);
-
-  } finally {
-    await art_admin.close();
-    await purchase_admin.close();
-    await login_admin.close();
-  }
 
 }
 
@@ -415,31 +414,31 @@ Throws 'artwork_in_donations' if the artwork ID is in the collection orders
 
 artwork_id: String form of the ID of the artwork to be deleted.
 */
-async function remove_artwork(artwork_id){
+async function remove_artwork(artwork_id) {
 
-  try {
+    try {
 
-    in_donations = await query("donations", {artwork_id: artwork_id}, single = true);
-    if (in_donations) {
-      throw "artwork_in_donations";
+        let in_donations = await query("donations", {artwork_id: artwork_id}, true);
+        if (in_donations) {
+            throw "artwork_in_donations";
+        }
+
+        let in_orders = await query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+        if (in_orders) {
+            throw "artwork_in_orders";
+        }
+
+        let object_id = new mongo.ObjectID(artwork_id);
+        query = {
+            _id: object_id
+        }
+
+        await art_admin.connect();
+        await art_admin.db("NWEN304").collection("artworks").deleteOne(query);
+
+    } finally {
+        await art_admin.close();
     }
-
-    in_orders = await query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, single = true);
-    if (in_orders) {
-      throw "artwork_in_orders";
-    }
-
-    object_id = new mongo.ObjectID(artwork_id);
-    query = {
-      _id: object_id
-    }
-
-    await art_admin.connect();
-    await art_admin.db("NWEN304").collection("artworks").deleteOne(query);
-
-  } finally {
-    await art_admin.close();
-  }
 
 }
 
@@ -447,19 +446,19 @@ async function remove_artwork(artwork_id){
 */
 async function remove_donation(donation_id) {
 
-  object_id = new mongo.ObjectID(donation_id);
-  query = {
-    _id: object_id
-  }
+    let object_id = new mongo.ObjectID(donation_id);
+    query = {
+        _id: object_id
+    }
 
-  try {
+    try {
 
-    await art_admin.connect();
-    await art_admin.db("NWEN304").collection("donations").deleteOne(query);
+        await art_admin.connect();
+        await art_admin.db("NWEN304").collection("donations").deleteOne(query);
 
-  } finally {
-    await art_admin.close();
-  }
+    } finally {
+        await art_admin.close();
+    }
 
 }
 
@@ -467,19 +466,19 @@ async function remove_donation(donation_id) {
 */
 async function remove_order(order_id) {
 
-  object_id = new mongo.ObjectID(order_id);
-  query = {
-    _id: object_id
-  }
+    let object_id = new mongo.ObjectID(order_id);
+    query = {
+        _id: object_id
+    }
 
-  try {
+    try {
 
-    await purchase_admin.connect();
-    await purchase_admin.db("NWEN304").collection("order").deleteOne(query);
+        await purchase_admin.connect();
+        await purchase_admin.db("NWEN304").collection("order").deleteOne(query);
 
-  } finally {
-    await purchase_admin.close();
-  }
+    } finally {
+        await purchase_admin.close();
+    }
 
 }
 
@@ -494,34 +493,47 @@ To update both price and author should be:
 
 Also just now realised the word is 'artist' not 'author'. Oops.
 */
-async function update_artwork(artwork_id, update){
+async function update_artwork(artwork_id, update) {
 
-  update_document(artwork_id, "artworks", update, art_admin);
+    await update_document(artwork_id, "artworks", update, art_admin);
 
 }
 
 /*Returns an array of json files consisting of all artworks in the collection*/
-async function get_all_art(){
+async function get_all_art() {
 
-  try {
+    try {
 
-    await art_admin.connect();
-    return(await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
+        await art_admin.connect();
+        return (await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
 
-  } finally {
-    await art_admin.close();
-  }
+    } finally {
+        await art_admin.close();
+    }
 
 }
+
 
 async function run() {
 
-  //artworks = ["6153e910fdf0e27c544a3f47", "6153e928fdf0e27c544a3f48"];
-  //await add_order("6153e32b7c06049ee653b013", artworks);
+    //artworks = ["6153e910fdf0e27c544a3f47", "6153e928fdf0e27c544a3f48"];
+    //await add_order("6153e32b7c06049ee653b013", artworks);
 
-  art = await get_all_art();
-  console.log(art);
+    let art = await get_all_art();
+    console.log(art);
 
 }
 
-run().catch(console.error);
+module.exports = {
+    add_donation,
+    add_art,
+    add_user,
+    add_order,
+    get_all_art,
+    remove_order,
+    remove_user,
+    remove_artwork,
+    remove_donation,
+    user_login
+}
+// run().catch(console.error);
