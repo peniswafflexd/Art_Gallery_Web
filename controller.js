@@ -534,6 +534,7 @@ module.exports = {
     remove_user,
     remove_artwork,
     remove_donation,
-    user_login
+    user_login,
+    update_artwork
 }
 // run().catch(console.error);

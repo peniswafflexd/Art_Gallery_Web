@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bodyParser = require("body-parser");
+const {validationResult, check} = require('express-validator');
+
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const {get_all_art, add_art, remove_artwork, update_artwork, user_login, add_user} = require("./controller");
@@ -48,6 +50,41 @@ const populateArtworkMap = async (data) => {
         artworkMap.set(artwork_id, art)
     })
 }
+const validate = (method) => {
+    console.log("validating")
+    switch (method) {
+        case 'updateArtwork': {
+            return [
+                check('author', "author is not in string format").isString().optional(),
+                check('desc', "Description  is not in string format").isString().optional(),
+                check('price', "Price is invalid format").isFloat().optional(),
+                check('media', "media needs to be in URL format").isURL().optional(),
+            ]
+        }
+        case 'createArtwork': {
+            return [
+                check('author', "author doesn't exist").isString().not().isEmpty(),
+                check('desc', "Description doesn't exits").isString().not().isEmpty(),
+                check('price', "Price is invalid format").isFloat().not().isEmpty(),
+                check('media', "media needs to be a URL").isURL().not().isEmpty(),
+            ]
+        }
+        case 'createUser': {
+            return [
+                check('user', "Username required").not().isEmpty(),
+                check('pass', "Password required").not().isEmpty(),
+                check('first', "First name can only contain letters").not().isEmpty().isAlpha(),
+                check('last', "Last name can only contain letters").not().isEmpty().isAlpha(),
+            ]
+        }
+        case 'loginUser': {
+            return [
+                check('user', "Username required").not().isEmpty(),
+                check('pass', "Password required").not().isEmpty(),
+            ]
+        }
+    }
+}
 
 //this function gets run on every request
 router.use((req, res, next) => {
@@ -66,7 +103,6 @@ router.get('', (req, res) => {
         populateArtworkMap(data)
         res.render('pages/index');
     })
-
 });
 
 router.get('/sign-up', (req, res) => {
@@ -89,28 +125,31 @@ router.get('/order', (req, res) => {
     res.render('pages/order');
 });
 
-router.post("/art", (req, res) => {
-    let author = req.body.author
-    let description = req.body.desc
-    let media_url = req.body.media
-    let price = req.body.price
-    add_art(author, description, media_url, price)
+router.post("/art",validate("createArtwork") ,(req, res) => {
+    const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
+    if (!errors.isEmpty()) {
+        res.status(422).json({errors: errors.array()});
+        return;
+    }
+    const {author, desc, media, price} = req.body
+    add_art(author, desc, media, price)
         .then(data => {
             populateArtworkMap(data);
         }).catch(err => {
-            console.error(err)
+        console.error(err)
     })
 });
 
 router.delete("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
+    if(!artworkMap.has(artwork_id)) return res.send("Artwork ID doesn't exist");
     remove_artwork(artwork_id)
         .then(() => {
             get_all_art().then(data => populateArtworkMap(data));
         }).catch(err => {
-            if(err === "artwork_in_donations") res.send("Cannot delete this artwork")
-            else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
-            else console.error(err);
+        if (err === "artwork_in_donations") res.send("Cannot delete this artwork")
+        else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
+        else console.error(err);
     })
 })
 
@@ -121,24 +160,25 @@ router.delete("/art/:artwork_id", (req, res) => {
 router.get("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
     let currentArtwork = artworkMap.get(artwork_id);
-    if(currentArtwork){
+    if (currentArtwork) {
         res.render("pages/artwork", {currentArtwork});
-    }else{
+    } else {
         res.send("This is not a valid artwork ID");
     }
 })
 
-app.put("/art/:artwork_id", (req, res) => {
-    let artwork_id = req.params.artwork_id
-    let price = req.body.price
-    let author = req.body.author
-    let media_url = req.body.media
-    let description = req.body.desc
+app.put("/art/:artwork_id", validate("updateArtwork"), (req, res) => {
+    const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
+    if (!errors.isEmpty()) {
+        res.status(422).json({errors: errors.array()});
+        return;
+    }
+    const {artwork_id, author, media, desc, price} = req.body;
     let update = {}
-    if(price) update.price = price
-    if(author) update.author = author
-    if(media_url) update.media_url = media_url
-    if(description) update.description = description
+    if (price) update.price = price
+    if (author) update.author = author
+    if (media) update.media_url = media
+    if (desc) update.description = desc
     console.log(update);
     update_artwork(artwork_id, update).then(data => {
         populateArtworkMap(data);
@@ -147,35 +187,41 @@ app.put("/art/:artwork_id", (req, res) => {
     })
 })
 
-router.post("/login", (req, res) => {
-    let username = req.body.user
-    let password = req.body.pass
-    user_login(username, password)
-        .then(data => {
-            req.session.userid = username;
-            req.session.user = data
-            console.log(`${username} logged in!`);
-            res.redirect("/");
-        })
-        .catch(err => {
-            if (err === 'passwords_do_not_match') res.send("Passwords do not match")
-            else if (err === 'username_not_found') res.send("Username not found")
-            else console.error(err);
-        })
-})
+router.post("/login", validate('loginUser'), (req, res) => {
+        const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
+        if (!errors.isEmpty()) {
+            res.status(422).json({errors: errors.array()});
+            return;
+        }
+        const {user, pass} = req.body;
+        user_login(user, pass)
+            .then(data => {
+                req.session.userid = user;
+                req.session.user = data
+                console.log(`${user} logged in!`);
+                res.redirect("/");
+            })
+            .catch(err => {
+                if (err === 'passwords_do_not_match') res.send("Passwords do not match")
+                else if (err === 'username_not_found') res.send("Username not found")
+                else console.error(err);
+            })
+    })
 
-router.post('/sign-up', (req, res) => {
-    let username = req.body.user
-    let password = req.body.pass
-    let firstname = req.body.first
-    let lastname = req.body.last
-    add_user(username, password, firstname, lastname, false).then((data) => {
-        req.session.userid = username;
+router.post('/sign-up',validate('createUser'), (req, res) => {
+    const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
+    if (!errors.isEmpty()) {
+        res.status(422).json({errors: errors.array()});
+        return;
+    }
+    const {user, pass, first, last} = req.body;
+    add_user(user, pass, first, last, false).then((data) => {
+        req.session.userid = user;
         req.session.user = data
         res.redirect("/");
-        console.log("New user created: " + username);
+        console.log("New user created: " + user);
     }).catch(err => {
-        if (err === 'username_taken') res.send("That username is taken");
+        if (err === 'user_taken') res.send("That user is taken");
         console.log(err)
     })
 });
@@ -189,3 +235,4 @@ router.get('/logout', (req, res) => {
 app.listen(8080, () => {
     console.log('Server is listening on port 8080');
 });
+
