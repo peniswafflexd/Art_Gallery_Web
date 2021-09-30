@@ -18,5 +18,27 @@
             <li> <a class="nav-link" href="/art/<%-artwork[i]._id%>"> <%= JSON.stringify(artwork[i]) %> </a> </li>
         <% } %>
     </ul>
+    
+    <div class = "container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Author</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Media</th>
+                </tr>
+                <!-- If the user and the username are true thus mean they are logged in, they are able to add items to cart/orders-->
+                <% if((user)&&(user.username)){ %>
+                    <td>
+                        <button >ADD TO CART</button>
+                    </td>
+
+                <%}%>
+            </thead>
+        </table>
+
+
+    </div>
 </body>
 </html>
