@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "watch": "npx nodejs-hot-reload entry=./server.js outDir=./build"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
