@@ -258,14 +258,15 @@ router.post('/sign-up', validate('createUser'), (req, res) => {
 
 router.post('/cart/:artwork_id', (req, res) => {
     const artwork_id = req.params.artwork_id
-    if(!req?.session?.user?._id) res.send("You need to login before purchasing artwork")
     const artworkObj = artworkMap.get(artwork_id);
-    if (!artworkObj) res.send("Hmm we can't seem to find that artwork sorry")
+    if(!req?.session?.user?._id) res.send("You need to login before purchasing artwork")
+    else if (!artworkObj) res.send("Hmm we can't seem to find that artwork sorry")
     else {
         if(!req?.session?.cart) req.session.cart = [artworkObj]
         else req.session.cart = [...req.session.cart, artworkObj];
+        res.redirect('/')
     }
-
+    console.log("failed")
 })
 
 router.get('/logout', (req, res) => {
@@ -278,7 +279,7 @@ router.get('/sign-up', (req, res) => {
 });
 
 router.get('/cart', (req, res) => {
-    res.render('pages/cart');
+    res.render('pages/cart', {cartItems: req.session.cart});
 });
 
 router.get('/donate', (req, res) => {
