@@ -9,7 +9,10 @@
     <script>
         const errorImg = "https://www.google.com/search?q=no+image&rlz=1C1CHBD_enNZ962NZ962&sxsrf=AOaemvI3hfd-dnV8Dow55eqW9jQs8xPkng:1633055146285&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj1vpG_lKjzAhXz4XMBHYt5BsoQ_AUoAXoECAEQAw&biw=1433&bih=668&dpr=2.68#imgrc=-QpL1I7u3zbiBM"
     </script>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+
     <style>
+
         .imageCont {
             border-radius: 0 0 5px 5px;
             border-width: 1px;
@@ -19,7 +22,15 @@
             width: 100%;
             height: min-content;
             padding: 0;
-            background-color: #4D4B4B;
+            background-color: var(--foreground-black);
+            transition: all .2s ease-in-out;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .imageCont:hover {
+            transform: scale(1.05);
+            opacity: 1;
         }
 
         .gall-img {
@@ -47,10 +58,6 @@
             margin: 0;
             padding: 0;
         }
-        body {
-            background-color: #191919;
-            color: #C0F5FA
-        }
     </style>
 </head>
 <body>
@@ -66,8 +73,8 @@
                 <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'" >
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
-                        <p class="author">Artist: <%= artwork[i + 2].author %></p>
-                        <p class="price">Price: $<%= artwork[i + 2].price %></p>
+                        <p class="author">Artist: <%= artwork[i].author %></p>
+                        <p class="price">Price: $<%= artwork[i].price %></p>
                     </div>
                 </div>
             <% } %>
@@ -75,7 +82,7 @@
         <div class="col-sm">
             <% for (let i = 1; i < artwork.length; i += 3) { %>
                 <!--        <li><a class="nav-link" href="/art/<%- /*artwork[i]._id*/ %>"> <%= /*JSON.stringify(artwork[i])*/ %> </a></li>-->
-                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i + 1]._id %>'">
+                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
                         <p class="author">Artist: <%= artwork[i].author %></p>

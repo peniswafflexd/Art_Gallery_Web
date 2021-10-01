@@ -1,0 +1,13 @@
+
+:root {
+    --background-black: #191919;
+    --foreground-black: #4D4B4B;
+    --text-blue: #C0F5FA ;
+    --primary-blue: #4CE0D2
+}
+html, body {
+    background-color: var(--background-black);
+    color: var(--text-blue);
+    margin: 0;
+    width: 100%;
+}

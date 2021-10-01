@@ -5,7 +5,15 @@ const {validationResult, check} = require('express-validator');
 
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
-const {get_all_art, add_art, remove_artwork, update_artwork, user_login, add_user, add_donation} = require("./controller");
+const {
+    get_all_art,
+    add_art,
+    remove_artwork,
+    update_artwork,
+    user_login,
+    add_user,
+    add_donation
+} = require("./controller");
 const app = express();
 
 // creating 24 hours from milliseconds
@@ -19,6 +27,8 @@ app.use(sessions({
     cookie: {maxAge: ONE_DAY},
     resave: false
 }));
+
+app.use(express.static(__dirname + '/public'));
 
 //initialise the body-parser middleware for post requests
 app.use(bodyParser.urlencoded({extended: false}));
@@ -49,16 +59,16 @@ const populateArtworkMap = async (data) => {
         let artwork_id = art._id.toString().split(`"`)[0]
         artworkMap.set(artwork_id, art)
     })
-    console.log("before: " +data.length)
+    console.log("before: " + data.length)
     let mod = data.length % 3;
     let diff = 3 - mod;
     console.log(diff)
-    if(mod !== 0){
-         for(let i=0; i < diff; i++){
-             data[data.length + i] = {}
-         }
+    if (mod !== 0) {
+        for (let i = 0; i < diff; i++) {
+            data[data.length + i] = {}
+        }
     }
-    console.log("after: " +data.length)
+    console.log("after: " + data.length)
 
     app.locals.artwork = data;
 }
@@ -130,6 +140,7 @@ router.post("/art", validate("createArtwork"), (req, res) => {
         res.status(422).json({errors: errors.array()});
         return;
     }
+    if(!req.session.user._id) res.send("You must be logged in to donate art")
     const {author, desc, media, price} = req.body
     add_donation(req.session.user._id, author, desc, media, price)
         .then(() => {
@@ -145,14 +156,16 @@ router.post("/art", validate("createArtwork"), (req, res) => {
  */
 router.delete("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
-    if (!artworkMap.has(artwork_id)) return res.send("Artwork ID doesn't exist");
+    if (!artworkMap.has(artwork_id)) res.send("Artwork ID doesn't exist");
     remove_artwork(artwork_id)
         .then(() => {
+            console.log("deleting " + artwork_id)
             get_all_art().then(data => populateArtworkMap(data));
+            res.redirect('/')
         }).catch(err => {
         if (err === "artwork_in_donations") res.send("Cannot delete this artwork")
         else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
-        else console.error(err);
+        console.error(err);
     })
 })
 
@@ -188,6 +201,7 @@ app.put("/art/:artwork_id", validate("updateArtwork"), (req, res) => {
 router.get("/art/:artwork_id", (req, res) => {
     const artwork_id = req.params.artwork_id
     let currentArtwork = artworkMap.get(artwork_id);
+
     if (currentArtwork) {
         res.render("pages/artwork", {currentArtwork});
     } else {
@@ -241,6 +255,18 @@ router.post('/sign-up', validate('createUser'), (req, res) => {
         console.log(err)
     })
 });
+
+router.post('/cart/:artwork_id', (req, res) => {
+    const artwork_id = req.params.artwork_id
+    if(!req?.session?.user?._id) res.send("You need to login before purchasing artwork")
+    const artworkObj = artworkMap.get(artwork_id);
+    if (!artworkObj) res.send("Hmm we can't seem to find that artwork sorry")
+    else {
+        if(!req?.session?.cart) req.session.cart = [artworkObj]
+        else req.session.cart = [...req.session.cart, artworkObj];
+    }
+
+})
 
 router.get('/logout', (req, res) => {
     req.session.destroy();
