@@ -8,10 +8,31 @@
     <%- include('../partials/head'); %>
 </head>
 <body>
-    <script src="ejs.min.js"></script>
-    <header>
-        <%- include('../partials/nav'); %>
-    </header>
-    Donate Page
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav'); %>
+</header>
+Donate Page
+<% if (!user.ID) { %>
+    <h2>You must be logged in to donate artwork</h2>
+<% }else{ %>
+
+    <form action="/art" method="post">
+        <h2>Donate</h2>
+        <div class="input-field">
+            <input type="text" name="author" id="author" placeholder="Enter Author Name">
+        </div>
+        <div class="input-field">
+            <input type="number" name="price" id="price" placeholder="Enter Price">
+        </div>
+        <div class="input-field">
+            <input type="url" name="media" id="media" placeholder="Enter Image URL">
+        </div>
+        <div class="input-field">
+            <textarea type="text" name="desc" id="desc" placeholder="Enter Description"></textarea>
+        </div>
+        <input type="submit" value="Donate">
+    </form>
+<% } %>
 </body>
 </html>

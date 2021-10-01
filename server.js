@@ -5,7 +5,7 @@ const {validationResult, check} = require('express-validator');
 
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
-const {get_all_art, add_art, remove_artwork, update_artwork, user_login, add_user} = require("./controller");
+const {get_all_art, add_art, remove_artwork, update_artwork, user_login, add_user, add_donation} = require("./controller");
 const app = express();
 
 // creating 24 hours from milliseconds
@@ -49,6 +49,18 @@ const populateArtworkMap = async (data) => {
         let artwork_id = art._id.toString().split(`"`)[0]
         artworkMap.set(artwork_id, art)
     })
+    console.log("before: " +data.length)
+    let mod = data.length % 3;
+    let diff = 3 - mod;
+    console.log(diff)
+    if(mod !== 0){
+         for(let i=0; i < diff; i++){
+             data[data.length + i] = {}
+         }
+    }
+    console.log("after: " +data.length)
+
+    app.locals.artwork = data;
 }
 
 /**
@@ -112,16 +124,17 @@ router.get('', (req, res) => {
 /**
  * creates and adds a piece of artwork to the database
  */
-router.post("/art",validate("createArtwork") ,(req, res) => {
+router.post("/art", validate("createArtwork"), (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
         res.status(422).json({errors: errors.array()});
         return;
     }
     const {author, desc, media, price} = req.body
-    add_art(author, desc, media, price)
-        .then(data => {
-            populateArtworkMap(data);
+    add_donation(req.session.user._id, author, desc, media, price)
+        .then(() => {
+            get_all_art().then(artArray => populateArtworkMap(artArray))
+            res.send("Thanks for donating!");
         }).catch(err => {
         console.error(err)
     })
@@ -132,7 +145,7 @@ router.post("/art",validate("createArtwork") ,(req, res) => {
  */
 router.delete("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
-    if(!artworkMap.has(artwork_id)) return res.send("Artwork ID doesn't exist");
+    if (!artworkMap.has(artwork_id)) return res.send("Artwork ID doesn't exist");
     remove_artwork(artwork_id)
         .then(() => {
             get_all_art().then(data => populateArtworkMap(data));
@@ -162,7 +175,7 @@ app.put("/art/:artwork_id", validate("updateArtwork"), (req, res) => {
     if (desc) update.description = desc
     console.log(update);
     update_artwork(artwork_id, update).then(data => {
-        populateArtworkMap(data);
+        populateArtworkMap(data).catch(err => console.error(err));
     }).catch(err => {
         console.error(err);
     })
@@ -183,36 +196,35 @@ router.get("/art/:artwork_id", (req, res) => {
 })
 
 
-
 /**
  * Logs a user in, and redirects them to the index page
  */
 router.post("/login", validate('loginUser'), (req, res) => {
-        const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
-        if (!errors.isEmpty()) {
-            res.status(422).json({errors: errors.array()});
-            return;
-        }
-        const {user, pass} = req.body;
-        user_login(user, pass)
-            .then(data => {
-                req.session.userid = user;
-                req.session.user = data
-                console.log(`${user} logged in!`);
-                res.redirect("/");
-            })
-            .catch(err => {
-                if (err === 'passwords_do_not_match') res.send("Passwords do not match")
-                else if (err === 'username_not_found') res.send("Username not found")
-                else console.error(err);
-            })
-    })
+    const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
+    if (!errors.isEmpty()) {
+        res.status(422).json({errors: errors.array()});
+        return;
+    }
+    const {user, pass} = req.body;
+    user_login(user, pass)
+        .then(data => {
+            req.session.userid = user;
+            req.session.user = data
+            console.log(`${user} logged in!`);
+            res.redirect("/");
+        })
+        .catch(err => {
+            if (err === 'passwords_do_not_match') res.send("Passwords do not match")
+            else if (err === 'username_not_found') res.send("Username not found")
+            else console.error(err);
+        })
+})
 
 /**
  * creates a new user document and logs the user in before
  * redirecting them to the index page
  */
-router.post('/sign-up',validate('createUser'), (req, res) => {
+router.post('/sign-up', validate('createUser'), (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
         res.status(422).json({errors: errors.array()});
