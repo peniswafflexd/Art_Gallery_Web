@@ -69,19 +69,21 @@
     <div class="row">
         <div class="col-sm">
             <% for (let i = 0; i < artwork.length; i += 3) { %>
-                <!--        <li><a class="nav-link" href="/art/<%- /*artwork[i]._id*/ %>"> <%= /*JSON.stringify(artwork[i])*/ %> </a></li>-->
-                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'" >
+                <% if(artwork[i]._id) { %>
+                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
                         <p class="author">Artist: <%= artwork[i].author %></p>
                         <p class="price">Price: $<%= artwork[i].price %></p>
                     </div>
                 </div>
+                <% } %>
             <% } %>
         </div>
         <div class="col-sm">
             <% for (let i = 1; i < artwork.length; i += 3) { %>
-                <!--        <li><a class="nav-link" href="/art/<%- /*artwork[i]._id*/ %>"> <%= /*JSON.stringify(artwork[i])*/ %> </a></li>-->
+                <% if(artwork[i]._id) { %>
+
                 <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
@@ -89,11 +91,13 @@
                         <p>Price: $<%= artwork[i].price %></p>
                     </div>
                 </div>
+                <% } %>
             <% } %>
+
         </div>
         <div class="col-sm">
             <% for (let i = 2; i < artwork.length; i += 3) { %>
-                <!--        <li><a class="nav-link" href="/art/<%- /*artwork[i]._id*/ %>"> <%= /*JSON.stringify(artwork[i])*/ %> </a></li>-->
+                <% if(artwork[i]._id) { %>
                 <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
@@ -101,7 +105,9 @@
                         <p>Price: $<%= artwork[i].price %></p>
                     </div>
                 </div>
+                <% } %>
             <% } %>
+
         </div>
     </div>
 </div>

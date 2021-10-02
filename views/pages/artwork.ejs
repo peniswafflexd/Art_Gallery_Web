@@ -7,13 +7,21 @@
     <title>Document</title>
     <%- include('../partials/head'); %>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
-<script>
-    function test() {
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("DELETE", "/art/<%=currentArtwork._id%>", true);
-        xhttp.send();
-    }
-</script>
+    <script>
+        function test() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("DELETE", "/art/<%= currentArtwork._id %>", true);
+            xhttp.onreadystatechange = () => {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.response === "ok") {
+                        window.location.href = '/'
+                    }
+                }
+            }
+            xhttp.send();
+
+        }
+    </script>
 
     <style>
         .container {
@@ -60,10 +68,15 @@
             border-bottom-right-radius: 10px;
         }
 
-        Button {
-            width: 50%;
+        .button {
+            width: 100%;
             margin: 20px;
             height: 30px;
+        }
+
+        Button {
+            height: 100%;
+            width: 100%;
             background-color: var(--primary-blue);
         }
 
@@ -79,7 +92,6 @@
     <%- include('../partials/nav'); %>
 </header>
 Artwork
-<%- //JSON.stringify(currentArtwork)  %>
 <div class="container">
     <img src="<%= currentArtwork.media_url %>" alt="Artwork"/>
     <div class="info-container">
@@ -88,13 +100,16 @@ Artwork
             <p><b>Description: </b><%= currentArtwork.description %></p>
             <p><b>Price: $</b><%= currentArtwork.price %></p>
         </div>
-<!--        <div class="button-container">-->
-            <form class="button-container" action="/cart/<%= currentArtwork._id %>" method="post">
+        <div class="button-container">
+            <form class="button" action="/cart/<%= currentArtwork._id %>" method="post">
                 <Button name="cart" title="Add to cart" value="Add to cart">Add to cart</Button>
-                <Button title="Delete" value="Delete" onclick="test()">Delete</Button>
             </form>
-
-<!--        </div>-->
+            <% if(admin) { %>
+                <div class="button">
+                    <Button title="Delete" value="Delete" onclick="test()">Delete</Button>
+                </div>
+            <% } %>
+        </div>
     </div>
 </div>
 </body>

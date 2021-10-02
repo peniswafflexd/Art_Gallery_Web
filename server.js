@@ -7,7 +7,6 @@ const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const {
     get_all_art,
-    add_art,
     remove_artwork,
     update_artwork,
     user_login,
@@ -59,16 +58,13 @@ const populateArtworkMap = async (data) => {
         let artwork_id = art._id.toString().split(`"`)[0]
         artworkMap.set(artwork_id, art)
     })
-    console.log("before: " + data.length)
     let mod = data.length % 3;
     let diff = 3 - mod;
-    console.log(diff)
     if (mod !== 0) {
         for (let i = 0; i < diff; i++) {
-            data[data.length + i] = {}
+            data.push({});
         }
     }
-    console.log("after: " + data.length)
 
     app.locals.artwork = data;
 }
@@ -156,12 +152,13 @@ router.post("/art", validate("createArtwork"), (req, res) => {
  */
 router.delete("/art/:artwork_id", (req, res) => {
     let artwork_id = req.params.artwork_id
+    if(!req.session.user.admin) res.send("You do not have valid permissions for this")
     if (!artworkMap.has(artwork_id)) res.send("Artwork ID doesn't exist");
     remove_artwork(artwork_id)
         .then(() => {
             console.log("deleting " + artwork_id)
             get_all_art().then(data => populateArtworkMap(data));
-            res.redirect('/')
+            res.end("ok")
         }).catch(err => {
         if (err === "artwork_in_donations") res.send("Cannot delete this artwork")
         else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
@@ -203,7 +200,7 @@ router.get("/art/:artwork_id", (req, res) => {
     let currentArtwork = artworkMap.get(artwork_id);
 
     if (currentArtwork) {
-        res.render("pages/artwork", {currentArtwork});
+        res.render("pages/artwork", {currentArtwork, admin: req.session.user.admin});
     } else {
         res.send("This is not a valid artwork ID");
     }
