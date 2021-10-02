@@ -1,7 +1,10 @@
 
 :root {
     --background-black: #191919;
+    /*--background-black: #101010;*/
     --foreground-black: #4D4B4B;
+    --dark-foreground-black: #252525;
+
     --text-blue: #C0F5FA ;
     --primary-blue: #4CE0D2
 }
