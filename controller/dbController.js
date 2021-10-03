@@ -96,7 +96,7 @@ single: Boolean, whether the function returns a single element or an array of
 elements. Single search is faster, and should be used when only a single entry
 is expected to be in the collection that matches the query.
 */
-async function query(collection, query, single = false, client = admin) {
+async function make_query(collection, query, single = false, client = admin) {
 
     try {
 
@@ -473,12 +473,12 @@ async function remove_artwork(artwork_id) {
 
     try {
 
-        let in_donations = await query("donations", {artwork_id: artwork_id}, true);
+        let in_donations = await make_query("donations", {artwork_id: artwork_id}, true);
         if (in_donations) {
             throw "artwork_in_donations";
         }
 
-        let in_orders = await query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+        let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
         if (in_orders) {
             throw "artwork_in_orders";
         }
@@ -504,7 +504,7 @@ no orders / donations, or if teh user has no orders / donations.
 ID: String ID of the artwork / user you're searchign for the donations / orders of.
 */
 async function donations_by_artwork(artwork_id){
-  let in_donations = await query("donations", {artwork_id: artwork_id}, true);
+  let in_donations = await make_query("donations", {artwork_id: artwork_id}, true);
 
   if (!in_donations){
     return null;
@@ -513,7 +513,7 @@ async function donations_by_artwork(artwork_id){
   return get_ID(in_donations);
 }
 async function orders_by_artwork(artwork_id){
-  let in_orders = await query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+  let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
 
   if (!in_orders){
     return null;
@@ -522,7 +522,7 @@ async function orders_by_artwork(artwork_id){
   return get_ID(in_orders);
 }
 async function donations_by_user(user_id){
-  let in_donations = await query("donations", {user_id: user_id}, true);
+  let in_donations = await make_query("donations", {user_id: user_id}, true);
 
   if (!in_donations){
     return null;
@@ -531,7 +531,7 @@ async function donations_by_user(user_id){
   return get_ID(in_donations);
 }
 async function orders_by_artwork(user_id){
-  let in_orders = await query("orders", {user_id: user_id}, true);
+  let in_orders = await make_query("orders", {user_id: user_id}, true);
 
   if (!in_orders){
     return null;
