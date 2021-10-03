@@ -497,6 +497,49 @@ async function remove_artwork(artwork_id) {
 
 }
 
+/*Next four functions are essentially identical. Take an artwork or user ID, and return
+the ID's of any orders or donations they are in. Returns null if the artwork is in
+no orders / donations, or if teh user has no orders / donations.
+
+ID: String ID of the artwork / user you're searchign for the donations / orders of.
+*/
+async function donations_by_artwork(artwork_id){
+  let in_donations = await query("donations", {artwork_id: artwork_id}, true);
+
+  if (!in_donations){
+    return null;
+  }
+
+  return get_ID(in_donations);
+}
+async function orders_by_artwork(artwork_id){
+  let in_orders = await query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+
+  if (!in_orders){
+    return null;
+  }
+
+  return get_ID(in_orders);
+}
+async function donations_by_user(user_id){
+  let in_donations = await query("donations", {user_id: user_id}, true);
+
+  if (!in_donations){
+    return null;
+  }
+
+  return get_ID(in_donations);
+}
+async function orders_by_artwork(user_id){
+  let in_orders = await query("orders", {user_id: user_id}, true);
+
+  if (!in_orders){
+    return null;
+  }
+
+  return get_ID(in_orders);
+}
+
 /*Removes a donation from the donaitions collection specified by donation_id
 */
 async function remove_donation(donation_id) {
@@ -571,11 +614,8 @@ async function get_all_art() {
 
 async function run() {
 
-    //artworks = ["6153e910fdf0e27c544a3f47", "6153e928fdf0e27c544a3f48"];
-    //await add_order("6153e32b7c06049ee653b013", artworks);
-
-    let art = await get_all_art();
-    console.log(art);
+    result = await donations_by_artwork("61564997cf45136ae0411a7f");
+    console.log(result);
 
 }
 
@@ -592,4 +632,5 @@ module.exports = {
     user_login,
     update_artwork
 }
-// run().catch(console.error);
+
+run().catch(console.error);
