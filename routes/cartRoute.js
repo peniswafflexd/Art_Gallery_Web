@@ -5,6 +5,7 @@ const cartRouter = express.Router()
 
 
 cartRouter.post('/:artwork_id', isLoggedIn, cartController.addToCart)
+cartRouter.delete('/:artwork_id', isLoggedIn, cartController.deleteFromCart);
 
 module.exports = {
     cartRouter

@@ -331,11 +331,9 @@ async function check_artworks(artwork_ids, client = admin) {
             throw 'art_' + artwork_ids[id] + '_not_available_for_purchase';
         }
 
-        price = price + art.price;
+        price = price + parseFloat(art.price);
 
     }
-
-    price = price.toFixed(2);
 
     return (price);
 
@@ -590,6 +588,7 @@ module.exports = {
     remove_artwork,
     remove_donation,
     user_login,
-    update_artwork
+    update_artwork,
+    check_artworks
 }
 // run().catch(console.error);

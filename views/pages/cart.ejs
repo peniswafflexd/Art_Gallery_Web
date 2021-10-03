@@ -7,17 +7,79 @@
     <title>Document</title>
     <%- include('../partials/head'); %>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <!--suppress CssUnresolvedCustomProperty -->
+    <script>
+        function delete() {
+            const xhttp = new XMLHttpRequest();
+            let id =1;
+            let url = "/cart/"+id;
+            alert(url);
+            xhttp.open("DELETE", url, true);
+            xhttp.onreadystatechange = () => {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.response === "ok") {
+                        location.reload()
+                    }
+                }
+            }
+            xhttp.send();
+
+        }
+    </script>
     <style>
         .container, table {
             width: 100%;
         }
-        img {
-            width: 150px;
-            height: auto;
-            object-fit: contain;
+        table * {
+            opacity: 0.9;
+            z-index: 1;
         }
-        tbody {
+
+        img {
+            --img-height: 90px;
+            min-height: var(--img-height);
+            min-width: var(--img-height);
+            max-height: var(--img-height);
+            max-width: var(--img-height);
+            border-style: solid;
+            border-width: 4px;
+            border-color: var(--foreground-black);
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .img-container0, .img-container1 {
+            position: relative;
+            display: flex;
+            align-items: center;
             width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 5px;
+        }
+
+        .img-container0 {
+            justify-content: flex-start;
+        }
+        .img-container1 {
+            justify-content: center;
+        }
+
+        .art-container {
+            border-width: 10px;
+            border-style: solid;
+            border-color: var(--background-black);
+            background-color: var(--foreground-black);
+            max-height: 20px;
+        }
+        tr, td *{
+            max-height: 50px !important;
+        }
+        tr:hover, tr:hover * {
+            opacity: 1;
+        }
+        td {
+            padding-left: 5px;
         }
     </style>
 </head>
@@ -38,7 +100,6 @@ Cart Page
 <% } else { %>
     <h2>ArtWork in cart</h2>
 
-    <p>Total Price:</p>
     <div class="container">
         <table>
             <thead>
@@ -52,14 +113,24 @@ Cart Page
             <tbody>
 
             <% for( let i = 0; i < cartItems.length; i++) { %>
-                <tr>
+                <tr class="art-container">
                     <td><%= cartItems[i].author %></td>
                     <td><%= cartItems[i].description %></td>
-                    <td><%= cartItems[i].price %></td>
-                    <td><img src="<%= cartItems[i].media_url %>" alt="Artwork"/></td>
+                    <td>$<%= cartItems[i].price %></td>
+                    <td>
+                        <div class="img-container<%= i % 2 %>"><img src="<%= cartItems[i].media_url %>" alt="Artwork"/>
+                        </div>
+                    </td>
+                    <td>
+                        <Button id="delete"  name="delete" value="delete" onclick="delete()">Delete</Button>
+                    </td>
                 </tr>
             <% } %>
-
+                <tr>
+                    <td>Total Price:</td>
+                    <td/>
+                    <td>$<%= price %></td>
+                </tr>
             </tbody>
         </table>
     </div>
