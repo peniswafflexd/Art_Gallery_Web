@@ -4,6 +4,8 @@ const scrypt = require('scrypt-js');
 const {Artwork} = require("../model/Artwork")
 const {User} = require("../model/User")
 
+//test
+
 /*Generic admin client with access with read-write access to every collection in
 the database. Should be used for debugging, rather than general use.*/
 const admin_uri = "mongodb+srv://admin:admin1@app.g1swe.mongodb.net"
