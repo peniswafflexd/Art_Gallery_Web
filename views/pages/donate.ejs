@@ -56,10 +56,10 @@
 <body>
 <script src="ejs.min.js"></script>
 <header>
-    <%- include('../partials/nav'); %>
+    <%- include('../partials/nav', {user}); %>
 </header>
 Donate Page
-<% if (!user.ID) { %>
+<% if (!user.id) { %>
     <h2>You must be logged in to donate artwork</h2>
 <% }else{ %>
     <div class="container">

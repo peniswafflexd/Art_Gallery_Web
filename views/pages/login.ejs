@@ -10,7 +10,7 @@
 <body>
     <script src="ejs.min.js"></script>
     <header>
-        <%- include('../partials/nav'); %>
+        <%- include('../partials/nav', {user}); %>
     </header>
     Login Page
      <form action="/login" method="post">

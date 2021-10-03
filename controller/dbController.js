@@ -1,6 +1,8 @@
 const {MongoClient} = require("mongodb");
 const mongo = require('mongodb');
 const scrypt = require('scrypt-js');
+const {Artwork} = require("../model/Artwork")
+const {User} = require("../model/User")
 
 /*Generic admin client with access with read-write access to every collection in
 the database. Should be used for debugging, rather than general use.*/
@@ -175,7 +177,7 @@ async function add_user(username, password, f_name, l_name, admin = false) {
             };
 
             await login_admin.db('NWEN304').collection('users').insertOne(new_user);
-            return new_user;
+            return new User(new_user);
         }
 
     } finally {
@@ -207,7 +209,7 @@ async function user_login(username, password) {
             let test_password = hash(password);
             if (test_password == account.password) {
 
-                return account;
+                return new User(account);
 
             } else {
                 throw 'passwords_do_not_match';
@@ -245,7 +247,7 @@ async function add_art(author, description, url, price) {
 
         let artwork = await art_admin.db("NWEN304").collection("artworks").insertOne(new_art);
 
-        return (artwork);
+        return (new Artwork(artwork));
 
     } finally {
         await art_admin.close();
@@ -505,8 +507,8 @@ async function get_all_art() {
     try {
 
         await art_admin.connect();
-        return (await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
-
+        let artworkArray = (await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
+        return artworkArray.map(art_data => new Artwork(art_data))
     } finally {
         await art_admin.close();
     }

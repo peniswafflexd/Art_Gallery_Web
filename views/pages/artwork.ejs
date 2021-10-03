@@ -89,7 +89,7 @@
 <body>
 <script src="ejs.min.js"></script>
 <header>
-    <%- include('../partials/nav'); %>
+    <%- include('../partials/nav', {user}); %>
 </header>
 Artwork
 <div class="container">
@@ -101,7 +101,7 @@ Artwork
             <p><b>Price: $</b><%= currentArtwork.price %></p>
         </div>
         <div class="button-container">
-            <form class="button" action="/cart/<%= currentArtwork._id %>" method="post">
+            <form class="button" action="/cart/<%= currentArtwork.id %>" method="post">
                 <Button name="cart" title="Add to cart" value="Add to cart">Add to cart</Button>
             </form>
             <% if(admin) { %>

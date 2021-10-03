@@ -63,14 +63,14 @@
 <body>
 <script src="ejs.min.js"></script>
 <header>
-    <%- include('../partials/nav'); %>
+    <%- include('../partials/nav', {user}); %>
 </header>
 <div class="container">
     <div class="row">
         <div class="col-sm">
             <% for (let i = 0; i < artwork.length; i += 3) { %>
-                <% if(artwork[i]._id) { %>
-                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
+                <% if(artwork[i].id) { %>
+                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
                         <p class="author">Artist: <%= artwork[i].author %></p>
@@ -82,9 +82,9 @@
         </div>
         <div class="col-sm">
             <% for (let i = 1; i < artwork.length; i += 3) { %>
-                <% if(artwork[i]._id) { %>
+                <% if(artwork[i].id) { %>
 
-                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
+                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
                         <p class="author">Artist: <%= artwork[i].author %></p>
@@ -97,8 +97,8 @@
         </div>
         <div class="col-sm">
             <% for (let i = 2; i < artwork.length; i += 3) { %>
-                <% if(artwork[i]._id) { %>
-                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i]._id %>'">
+                <% if(artwork[i].id) { %>
+                <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
                     <img class="gall-img" src="<%= artwork[i].media_url %>"/>
                     <div class="text-view">
                         <p class="author">Artist: <%= artwork[i].author %></p>
@@ -123,7 +123,7 @@
             <th>Media</th>
         </tr>
         <!-- If the user and the username are true thus mean they are logged in, they are able to add items to cart/orders-->
-        <% if((user) && (user.username)){ %>
+        <% if((user?.username)){ %>
             <td>
                 <button>ADD TO CART</button>
             </td>
