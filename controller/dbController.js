@@ -225,57 +225,6 @@ async function user_login(username, password) {
 
 }
 
-/*Adds (or replaces) a given o-auth token for a specific website onto the document
-for the given user in the users collection. It can handle any website you give it
-so you don't need to worry about them being froma  specific list or anything, and
-each account can handle unlimited websites.
-Throws 'user_not_found' if no user with a matching ID is found in the collection
-
-user_id: String form of the ID of the user who you want to add an o-auth token for.
-website: String, name of or other identifier for the website the token is for.
-token: String, the o-auth token to be saved.
-*/
-async function add_oauth_token(user_id, website, token){
-
-  let web_name = website + '_token';
-  update = {};
-
-  update[web_name] = token;
-
-  let response = await update_document(user_id, "users", update, login_admin);
-
-  if (response.matchedCount == 0) {
-    throw 'user_not_found';
-  }
-
-}
-
-/*Searches the users collection for a user with a matching ID, and returns the
-o-auth token for the requested website.
-Throws 'user_not_found' if no user with a matching ID is found in the collection
-
-user_id: String form of the ID of the user you want the o-auth token of.
-website: String, the identifier you used when you added the o-auth token.
-*/
-async function get_oauth_token(user_id, website){
-
-  let response = await get(user_id, "users", login_admin);
-
-  if (!response) {
-    throw 'user_not_found';
-  }
-
-  let web_name = website + '_token';
-  token = response[web_name];
-
-  if (!token) {
-    throw 'website_not_found';
-  }
-
-  return(token);
-
-}
-
 /*Adds an artwork to the collection of artworks
 
 author: String, the name of the author of the artwork

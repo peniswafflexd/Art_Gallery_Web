@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <style>
+        .container {
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            /*background-color: var(--foreground-black);*/
+        }
+        .form-container {
+            position: relative;
+            /*margin-left: auto;*/
+            margin-right: auto ;
+            align-self: center;
+            width: min-content;
+            justify-self: center;
+            background-color: var(--foreground-black);
+            padding: 2%;
+            border-radius: 10px;
+            border-style: solid;
+            border-width: 0.5px;
+        }
+        input, textarea {
+            margin: 5px;
+            border-radius: 5px;
+            background-color: var(--dark-foreground-black);
+            color: var(--primary-blue)
+        }
+        textarea, .button {
+            width: 95%;
+        }
+        img {
+            object-fit: contain;
+            max-height: 350px;
+        }
+    </style>
+    <script>
+        const change = () => {
+            let URLInputRef = document.getElementById("media")
+            let imgRef = document.getElementById("artwork-img")
+            imgRef.src = URLInputRef.value;
+        }
+    </script>
+</head>
+<body>
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+Donate Page
+<% if (!user.id) { %>
+    <h2>You must be logged in to donate artwork</h2>
+<% }else{ %>
+    <div class="container">
+        <div class="form-container">
+            <form action="/art" method="post">
+                <h2>Donate</h2>
+                <div class="input-field">
+                    <input type="text" name="author" id="author" placeholder="Enter Author Name">
+                </div>
+                <div class="input-field">
+                    <input type="number" name="price" id="price" placeholder="Enter Price">
+                </div>
+                <div class="input-field">
+                    <input type="url" name="media" id="media" placeholder="Enter Image URL" onchange="change()">
+                </div>
+                <div class="input-field">
+                    <textarea name="desc" id="desc" placeholder="Enter Description"></textarea>
+                </div>
+                <input class="button" type="submit" value="Donate">
+            </form>
+        </div>
+        <img id="artwork-img" src="" alt="Your Artwork">
+    </div>
+<% } %>
+</body>
+</html>
