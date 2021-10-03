@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <style>
+        .container, table {
+            width: 100%;
+        }
+        img {
+            width: 150px;
+            height: auto;
+            object-fit: contain;
+        }
+        tbody {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+Cart Page
+
+<!--Need to add user session checking
+    Along with the addition using the server.js and
+    art objects to pull in the objects into the table
+
+-->
+<% if(!cartItems){ %>
+    <p>You have no items in your cart</p>
+<% } else { %>
+    <h2>ArtWork in cart</h2>
+
+    <p>Total Price:</p>
+    <div class="container">
+        <table>
+            <thead>
+            <tr>
+                <th>Author</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Media</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <% for( let i = 0; i < cartItems.length; i++) { %>
+                <tr>
+                    <td><%= cartItems[i].author %></td>
+                    <td><%= cartItems[i].description %></td>
+                    <td><%= cartItems[i].price %></td>
+                    <td><img src="<%= cartItems[i].media_url %>" alt="Artwork"/></td>
+                </tr>
+            <% } %>
+
+            </tbody>
+        </table>
+    </div>
+<% } %>
+
+</body>
+</html>

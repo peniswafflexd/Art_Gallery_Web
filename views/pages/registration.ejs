@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+    <script src="ejs.min.js"></script>
+    <header>
+        <%- include('../partials/nav', {user}); %>
+    </header>
+    Registration Page
+    <form action="/sign-up" method="post">
+        <h2>Sign Up</h2>
+        <div class="input-field">
+            <input type="text" name="first" id="first" placeholder="Enter First Name">
+        </div>
+        <div class="input-field">
+            <input type="text" name="last" id="last" placeholder="Enter Last Name">
+        </div>
+        <div class="input-field">
+            <input type="text" name="user" id="user" placeholder="Enter Username">
+        </div>
+        <div class="input-field">
+            <input type="password" name="pass" id="pass" placeholder="Enter Password">
+        </div>
+        <input type="submit" value="Sign Up">
+    </form>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <script>
+        function test() {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("DELETE", "/art/<%= currentArtwork._id %>", true);
+            xhttp.onreadystatechange = () => {
+                if (xhttp.readyState === 4) {
+                    if (xhttp.response === "ok") {
+                        window.location.href = '/'
+                    }
+                }
+            }
+            xhttp.send();
+
+        }
+    </script>
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            background-color: var(--foreground-black);
+            margin-right: 50px;
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        img {
+            margin: 10px;
+            width: 50%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .info-container {
+            margin: 10px;
+            min-height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            border-radius: 10px;
+            border-style: solid;
+            border-width: 0.5px;
+            border-color: var(--text-blue);
+        }
+
+        .desc-container {
+            flex: 0.8;
+            padding: 10px;
+        }
+
+        .button-container {
+            flex: 0.2;
+            display: flex;
+            flex-direction: row;
+            justify-self: flex-end;
+            margin: 0;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .button {
+            width: 100%;
+            margin: 20px;
+            height: 30px;
+        }
+
+        Button {
+            height: 100%;
+            width: 100%;
+            background-color: var(--primary-blue);
+        }
+
+        b {
+            color: var(--primary-blue)
+        }
+
+    </style>
+</head>
+<body>
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+Artwork
+<div class="container">
+    <img src="<%= currentArtwork.media_url %>" alt="Artwork"/>
+    <div class="info-container">
+        <div class="desc-container">
+            <p><b>Author: </b><%= currentArtwork.author %>  </p>
+            <p><b>Description: </b><%= currentArtwork.description %></p>
+            <p><b>Price: $</b><%= currentArtwork.price %></p>
+        </div>
+        <div class="button-container">
+            <form class="button" action="/cart/<%= currentArtwork.id %>" method="post">
+                <Button name="cart" title="Add to cart" value="Add to cart">Add to cart</Button>
+            </form>
+            <% if(admin) { %>
+                <div class="button">
+                    <Button title="Delete" value="Delete" onclick="test()">Delete</Button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+</body>
+</html>
