@@ -1,7 +1,6 @@
 const {validationResult} = require("express-validator");
-const {add_donation, get_all_art, remove_artwork, update_artwork} = require("./dbController");
-const {populateArtworkMap} = require("./modelController")
-const {artworkMap} = require("../model/Artwork")
+const {artworkMap, Artwork} = require("../model/Artwork")
+const dbController = require("./dbController");
 
 
 const getArt = (req, res) => {
@@ -20,31 +19,22 @@ const postArt = (req, res) => {
         res.status(422).json({errors: errors.array()});
         return;
     }
-    if(!req.session.user._id) res.send("You must be logged in to donate art")
     const {author, desc, media, price} = req.body
-    add_donation(req.session.user.id, author, desc, media, price)
-        .then(() => {
-            get_all_art().then(artArray => populateArtworkMap(artArray))
-            res.send("Thanks for donating!");
-        }).catch(err => {
-        console.error(err)
-    })
+    const newArtwork = new Artwork(author, false, desc, media, price, null , false)
+    newArtwork.setDBController(dbController)
+    newArtwork.save(req.session.user.id);
+    res.redirect("/");
 };
 
 const deleteArt = (req, res) => {
+    console.log("deleting art")
     let artwork_id = req.params.artwork_id
     if(!req?.session?.user?.admin) res.send("You do not have valid permissions for this")
-    if (!artworkMap.has(artwork_id)) res.send("Artwork ID doesn't exist");
-    remove_artwork(artwork_id)
-        .then(() => {
-            console.log("deleting " + artwork_id)
-            get_all_art().then(data => populateArtworkMap(data));
-            res.end("ok")
-        }).catch(err => {
-        if (err === "artwork_in_donations") res.send("Cannot delete this artwork")
-        else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
-        console.error(err);
-    })
+    let artwork = artworkMap.get(artwork_id)
+    if (!artwork) res.send("Artwork ID doesn't exist");
+    artwork.setDBController(dbController)
+    artwork.delete();
+     res.end("ok")
 };
 
 const updateArt = (req, res) => {
@@ -55,17 +45,14 @@ const updateArt = (req, res) => {
     }
     const artwork_id = req.params.artwork_id
     const {author, media, desc, price} = req.body;
-    let update = {}
-    if (price) update.price = price
-    if (author) update.author = author
-    if (media) update.media_url = media
-    if (desc) update.description = desc
-    console.log(update);
-    update_artwork(artwork_id, update).then(data => {
-        populateArtworkMap(data).catch(err => console.error(err));
-    }).catch(err => {
-        console.error(err);
-    })
+    let artwork = artworkMap.get(artwork_id);
+    if (price) artwork.price = price
+    if (author) artwork.author = author
+    if (media) artwork.media_url = media
+    if (desc) artwork.description = desc
+    artwork.setDBController(dbController)
+    artwork.update();
+    res.redirect("/")
 };
 
 module.exports = {

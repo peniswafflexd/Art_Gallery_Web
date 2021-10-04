@@ -1,7 +1,5 @@
-const {updateLocals} = require("../utils/util");
-const {app} = require("../server");
 const {artworkMap} = require("../model/Artwork");
-const {check_artworks} = require("./dbController");
+const dbController = require("./dbController");
 
 
 const signup = (req, res) => {
@@ -11,7 +9,7 @@ const cart = (req, res) => {
     let price = 0;
     if(req.session.cart){
         let cartArtworkIds = req.session.cart.map(art => art.id)
-        check_artworks(cartArtworkIds)
+        dbController.check_artworks(cartArtworkIds)
             .then(newPrice => {
                 price = newPrice;
                 res.render('pages/cart', {cartItems: req.session.cart, price: price});
@@ -24,16 +22,22 @@ const cart = (req, res) => {
 }
 
 const donate = (req, res) => {
-    res.render('pages/donate');
+    let artworks;
+    dbController.donations_by_user(req.session.user.id)
+        .then(idArr => {
+            dbController.get_donations(idArr)
+                .then(donations => {
+                    artworks = donations.map(donation => artworkMap.get(donation.artwork_id));
+                    res.render('pages/donate', {donations: artworks});
+                })
+        })
 }
 
 const login = (req, res) => {
     res.render('pages/login');
 }
 
-const order = (req, res) => {
-    res.render('pages/order');
-}
+
 
 const root = (req, res) => {
     let artworkObjs =[ ...artworkMap.values() ];
@@ -50,7 +54,6 @@ module.exports = {
     cart,
     donate,
     login,
-    order,
     root,
     logout,
     signup

@@ -3,6 +3,7 @@ const mongo = require('mongodb');
 const scrypt = require('scrypt-js');
 const {Artwork} = require("../model/Artwork")
 const {User} = require("../model/User")
+const {Order} = require("../model/Order");
 
 //test
 
@@ -31,7 +32,7 @@ const N = 1024, r = 8, p = 1;
 const salt_buffer = Buffer.from(salt, 'utf-8');
 const dkLen = 32;
 let hashed_password;
-
+const dbController = this
 /*Salts and hashes a string into a secure form using the scrypt algorithm. Returns
 the salted and hashed password as a string.
 
@@ -69,6 +70,42 @@ async function get(id, collection, client = admin) {
         await client.close();
     }
 
+}
+
+async function get_orders(order_ids, client = admin){
+    try {
+
+        await client.connect();
+        let orderArr = []
+        for (const id of order_ids) {
+            // console.log("order id: "+ order_id)
+            let object_id = new mongo.ObjectID(id);
+            let item = await client.db('NWEN304').collection("orders").findOne({_id: object_id});
+            console.log("order data" + JSON.stringify(item));
+            orderArr.push(new Order(item))
+        }
+        return orderArr;
+
+    } finally {
+        await client.close();
+    }
+}
+
+async function get_donations(donation_ids, client = admin){
+    try {
+
+        await client.connect();
+        let donationArr = []
+        for (const id of donation_ids) {
+            let object_id = new mongo.ObjectID(id);
+            let item = await client.db('NWEN304').collection("donations").findOne({_id: object_id});
+            donationArr.push(item);
+        }
+        return donationArr;
+
+    } finally {
+        await client.close();
+    }
 }
 
 /*Returns a String consisting of the ID of the provided object. Useful as MongoDB
@@ -300,7 +337,7 @@ async function add_art(author, description, url, price) {
 
         let artwork = await art_admin.db("NWEN304").collection("artworks").insertOne(new_art);
 
-        return (new Artwork(artwork));
+        return (artwork);
 
     } finally {
         await art_admin.close();
@@ -502,40 +539,40 @@ no orders / donations, or if teh user has no orders / donations.
 ID: String ID of the artwork / user you're searchign for the donations / orders of.
 */
 async function donations_by_artwork(artwork_id){
-  let in_donations = await make_query("donations", {artwork_id: artwork_id}, true);
+  let in_donations = await make_query("donations", {artwork_id: artwork_id}, false);
 
   if (!in_donations){
     return null;
   }
 
-  return get_ID(in_donations);
+    return in_donations.map(donation => get_ID(donation));
 }
 async function orders_by_artwork(artwork_id){
-  let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+  let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, false);
 
   if (!in_orders){
     return null;
   }
 
-  return get_ID(in_orders);
+    return in_orders.map(order => get_ID(order));
 }
 async function donations_by_user(user_id){
-  let in_donations = await make_query("donations", {user_id: user_id}, true);
+  let in_donations = await make_query("donations", {user_id: user_id}, false);
 
   if (!in_donations){
     return null;
   }
 
-  return get_ID(in_donations);
+    return in_donations.map(donation => get_ID(donation));
 }
-async function orders_by_artwork(user_id){
-  let in_orders = await make_query("orders", {user_id: user_id}, true);
+async function orders_by_user(user_id){
+  let in_orders = await make_query("orders", {user_id: user_id}, false);
 
   if (!in_orders){
     return null;
   }
 
-  return get_ID(in_orders);
+  return in_orders.map(order => get_ID(order));
 }
 
 /*Removes a donation from the donaitions collection specified by donation_id
@@ -602,7 +639,8 @@ async function get_all_art() {
 
         await art_admin.connect();
         let artworkArray = (await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
-        return artworkArray.map(art_data => new Artwork(art_data))
+        const newArt = artworkArray.map(art_data => new Artwork(art_data, true))
+        return newArt
     } finally {
         await art_admin.close();
     }
@@ -629,7 +667,13 @@ module.exports = {
     remove_donation,
     user_login,
     update_artwork,
-    check_artworks
+    check_artworks,
+    orders_by_user,
+    orders_by_artwork,
+    donations_by_artwork,
+    donations_by_user,
+    get_orders,
+    get_donations
 }
 
 //run().catch(console.error);

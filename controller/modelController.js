@@ -1,6 +1,4 @@
-const {app} = require("../server")
-const {artworkMap, Artwork} = require("../model/Artwork")
-
+const {artworkMap} = require("../model/Artwork")
 /**
  * populates the artwork map when artwork page
  * is shown, runs asynchronously as to not slow
@@ -18,7 +16,7 @@ const populateArtworkMap = async (data) => {
             data.push({});
         }
     }
-    // app.locals.artwork = data;
+    // console.log(artworkMap)
 }
 
 module.exports = {

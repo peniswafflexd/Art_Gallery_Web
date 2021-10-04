@@ -10,6 +10,7 @@ const {updateLocals} = require("./middleware/security")
 const {artRouter} = require("./routes/artRoute")
 const {rootRouter} = require("./routes/rootRoute")
 const {cartRouter} = require("./routes/cartRoute")
+const {orderRouter} = require("./routes/orderRoute");
 // creating 24 hours from milliseconds
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -38,6 +39,7 @@ app.set('view engine', 'ejs');
 app.use("/", updateLocals, rootRouter);
 app.use("/art",updateLocals, artRouter)
 app.use("/cart",updateLocals, cartRouter)
+app.use("/order", updateLocals, orderRouter)
 
 // app.locals.user = {ID: null}
 

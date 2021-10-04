@@ -1,4 +1,7 @@
 const artworkMap = new Map();
+module.exports = {artworkMap}
+const {populateArtworkMap} = require("../controller/modelController");
+
 
 /**
  * artwork entity model
@@ -14,7 +17,7 @@ class Artwork {
      * @param price
      * @param id
      */
-    constructor(authorOrObj, desc, media, price, id, purchased) {
+    constructor(authorOrObj, isSaved, desc, media, price, id, purchased) {
         if(authorOrObj.author && authorOrObj.description && authorOrObj.price && authorOrObj._id && authorOrObj.media_url){
             this.author = authorOrObj.author;
             this.description = authorOrObj.description;
@@ -30,11 +33,54 @@ class Artwork {
             this.id = id;
             this.purchased = purchased;
         }
-        // console.log(this);
+        this.isSaved = isSaved;
+    }
+
+    setDBController(dbController){
+        this.dbController = dbController;
+    }
+
+    save(userid) {
+        if(!this.dbController) return console.error("dbController not set!")
+        if(this.isSaved) return;
+        this.dbController.add_donation(userid, this.author, this.description, this.media_url, this.price)
+            .then(() => {
+                this.dbController.get_all_art().then(artArray => populateArtworkMap(artArray))
+                this.isSaved = true;
+            }).catch(err => {
+            console.error(err)
+        })
+    }
+
+    update(){
+        if(!this.dbController) return console.error("dbController not set!")
+        const updateObj = {
+            price: this.price,
+            media_url: this.media_url,
+            author: this.author,
+            description: this.description,
+            purchased: this.purchased
+        }
+        this.dbController.update(this.id, updateObj)
+            .catch(err => console.log(err))
+    }
+
+    delete() {
+        if(!this.dbController) return console.error("dbController not set!")
+        this.dbController.remove_artwork(this.id)
+            .then(() => {
+                console.log("deleting " + this.id)
+                this.dbController.get_all_art().then(data => populateArtworkMap(data));
+                artworkMap.delete(this.id)
+            }).catch(err => {
+            // if (err === "artwork_in_donations")
+            // else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
+            console.error(err);
+        })
     }
 }
 
 module.exports = {
-    artworkMap,
+    ...module.exports,
     Artwork
 }

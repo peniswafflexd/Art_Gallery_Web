@@ -18,10 +18,11 @@
             flex-direction: row;
             /*background-color: var(--foreground-black);*/
         }
+
         .form-container {
             position: relative;
             /*margin-left: auto;*/
-            margin-right: auto ;
+            margin-right: auto;
             align-self: center;
             width: min-content;
             justify-self: center;
@@ -31,18 +32,84 @@
             border-style: solid;
             border-width: 0.5px;
         }
+
         input, textarea {
             margin: 5px;
             border-radius: 5px;
             background-color: var(--dark-foreground-black);
             color: var(--primary-blue)
         }
+
         textarea, .button {
             width: 95%;
         }
-        img {
+
+        .img-view {
             object-fit: contain;
             max-height: 350px;
+        }
+        .table-container {
+            padding: 2%;
+            width: 100%;
+        }
+        table {
+            width: 100%
+        }
+
+        table * {
+            opacity: 0.9;
+            z-index: 1;
+        }
+
+        .thumbnail {
+            --img-height: 90px;
+            min-height: var(--img-height);
+            min-width: var(--img-height);
+            max-height: var(--img-height);
+            max-width: var(--img-height);
+            border-style: solid;
+            border-width: 4px;
+            border-color: var(--foreground-black);
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .img-container0, .img-container1 {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 5px;
+        }
+
+        .img-container0 {
+            justify-content: flex-start;
+        }
+
+        .img-container1 {
+            justify-content: center;
+        }
+
+        .art-container {
+            border-width: 10px;
+            border-style: solid;
+            border-color: var(--background-black);
+            background-color: var(--foreground-black);
+            max-height: 20px;
+        }
+
+        tr, td * {
+            max-height: 50px !important;
+        }
+
+        tr:hover, tr:hover * {
+            opacity: 1;
+        }
+
+        td {
+            padding-left: 5px;
         }
     </style>
     <script>
@@ -51,10 +118,13 @@
             let imgRef = document.getElementById("artwork-img")
             imgRef.src = URLInputRef.value;
         }
+        const test = (elem) =>{
+            let artwork_id = elem.getAttribute("data-value")
+            window.location.href = "/art/"+artwork_id;
+        }
     </script>
 </head>
 <body>
-<script src="ejs.min.js"></script>
 <header>
     <%- include('../partials/nav', {user}); %>
 </header>
@@ -81,7 +151,34 @@ Donate Page
                 <input class="button" type="submit" value="Donate">
             </form>
         </div>
-        <img id="artwork-img" src="" alt="Your Artwork">
+        <img class="img-view" id="artwork-img" src="" alt="Your Artwork">
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>Author</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Media</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <% for( let i = 0; i < donations.length; i++) { %>
+                <tr class="art-container" data-value="<%= donations[i].id%>" onclick="test(this)">
+                    <td><%= donations[i].author %></td>
+                    <td><%= donations[i].description %></td>
+                    <td>$<b id="elemPrice<%= i %>"><%= donations[i].price %></b></td>
+                    <td>
+                        <div class="img-container<%= i % 2 %>"><img class="thumbnail" src="<%= donations[i].media_url %>" alt="Artwork"/>
+                        </div>
+                    </td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
     </div>
 <% } %>
 </body>

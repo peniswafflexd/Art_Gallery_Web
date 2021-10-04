@@ -57,8 +57,14 @@ const isLoggedIn = (req, res, next) =>{
 }
 
 const isAdmin = (req, res, next) => {
-    if(req.session?.user?.admin) next();
-    else res.redirect("/")
+    if(req.session?.user?.admin){
+        console.log("User is an admin")
+        next();
+    }
+    else {
+        console.log("User is NOT an admin")
+        res.redirect("/")
+    }
 }
 
 

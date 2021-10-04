@@ -26,8 +26,6 @@ rootRouter.get('/donate', isLoggedIn, rootController.donate);
 
 rootRouter.get('/login', rootController.login);
 
-rootRouter.get('/order', isLoggedIn, rootController.order);
-
 rootRouter.get('', rootController.root)
 
 module.exports = {

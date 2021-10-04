@@ -10,7 +10,8 @@
     <script>
         function test() {
             const xhttp = new XMLHttpRequest();
-            xhttp.open("DELETE", "/art/<%= currentArtwork._id %>", true);
+            xhttp.withCredentials = true;
+            xhttp.open("DELETE", "/art/<%= currentArtwork.id %>", true);
             xhttp.onreadystatechange = () => {
                 if (xhttp.readyState === 4) {
                     if (xhttp.response === "ok") {
