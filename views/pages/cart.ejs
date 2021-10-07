@@ -7,6 +7,7 @@
     <title>Document</title>
     <%- include('../partials/head'); %>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/cart.css" rel="stylesheet" type="text/css">
     <script>
 
         function test(elem, num) {
@@ -32,86 +33,6 @@
         <% } %>
 
     </script>
-    <style>
-        .container, table {
-            width: 100%;
-        }
-
-        table * {
-            opacity: 0.9;
-            z-index: 1;
-        }
-
-        img {
-            --img-height: 90px;
-            min-height: var(--img-height);
-            min-width: var(--img-height);
-            max-height: var(--img-height);
-            max-width: var(--img-height);
-            border-style: solid;
-            border-width: 4px;
-            border-color: var(--foreground-black);
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .img-container0, .img-container1 {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 5px;
-        }
-
-        .img-container0 {
-            justify-content: flex-start;
-        }
-
-        .img-container1 {
-            justify-content: center;
-        }
-
-        .art-container {
-            border-width: 10px;
-            border-style: solid;
-            border-color: var(--background-black);
-            background-color: var(--foreground-black);
-            max-height: 20px;
-        }
-
-        tr, td * {
-            max-height: 50px !important;
-        }
-
-        tr:hover, tr:hover * {
-            opacity: 1;
-        }
-
-        td {
-            padding-left: 5px;
-        }
-
-        .button-container {
-            width: 100%;
-        }
-
-        button {
-            background-color: var(--foreground-black);
-            border-style: solid;
-            border-width: 0.5px;
-            color: var(--text-blue);
-            width: 100%;
-            height: 100%;
-        }
-
-        #delete {
-            color: red;
-            font-weight: bold;
-            border-color: transparent;
-        }
-    </style>
 </head>
 <body>
 <script src="ejs.min.js"></script>
@@ -124,12 +45,13 @@
     art objects to pull in the objects into the table
 
 -->
-<% if(!cartItems || !cartItems.length > 0){ %>
-    <p>You have no items in your cart</p>
-<% } else { %>
-    <h2>ArtWork in cart</h2>
+
 
     <div class="container">
+        <% if(!cartItems || !cartItems.length > 0){ %>
+            <p>You have no items in your cart</p>
+        <% } else { %>
+            <h2>ArtWork in cart</h2>
         <table>
             <thead>
             <tr>

@@ -13,7 +13,7 @@ rootRouter.post("/login", validate('loginUser'), authController.postLogin)
  * creates a new user document and logs the user in before
  * redirecting them to the index page
  */
-rootRouter.post('/sign-up', validate('createUser'), authController.postSignup);
+rootRouter.post('/sign-up', validate("createUser"), authController.postSignup);
 
 
 rootRouter.get('/logout', isLoggedIn, rootController.logout);

@@ -1,0 +1,50 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: max-content;
+    gap: 10px;
+    margin-left: 40%;
+    padding-left: 0;
+}
+
+#errors {
+    height: max-content;
+    width: max-content;
+    flex-wrap: wrap;
+    padding: 8px;
+    background-color: rgba(254, 40, 40, 0.2);
+    border-radius: 15px;
+    border-color: red;
+    border-style: solid;
+    border-width: 0.5px;
+}
+
+li {
+    color: red;
+}
+
+.form {
+    position: relative;
+    /*margin-left: auto;*/
+    margin-right: auto;
+    align-self: center;
+    width: min-content;
+    background-color: var(--foreground-black);
+    padding: 10px;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 0.5px;
+}
+
+input, textarea {
+    margin: 5px;
+    border-radius: 5px;
+    background-color: var(--dark-foreground-black);
+    color: var(--primary-blue)
+}
+
+.button {
+    width: 95%;
+}

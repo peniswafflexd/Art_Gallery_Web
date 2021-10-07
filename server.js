@@ -26,6 +26,16 @@ app.use(sessions({
 app.use(express.static(__dirname + '/public'));
 
 //initialise the body-parser middleware for post requests
+// app.use(function(req, res, next) {
+//     req.rawBody = '';
+//     req.on('data', function(chunk) {
+//         req.rawBody += chunk;
+//     });
+//
+//     req.on('end', function() {
+//         next();
+//     });
+// });
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 

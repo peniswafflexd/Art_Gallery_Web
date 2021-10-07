@@ -1,5 +1,5 @@
-const {check} = require("express-validator");
-
+const {check, body} = require("express-validator");
+const dbController = require("../controller/dbController")
 
 /**
  * returns validation handler array for a method
@@ -7,8 +7,8 @@ const {check} = require("express-validator");
  * @returns validation check
  */
 const validate = (method) => {
-    switch (method) {
-        case 'updateArtwork': {
+    if (method === 'updateArtwork') {
+        {
             return [
                 check('author', "author is not in string format").isString().optional(),
                 check('desc', "Description  is not in string format").isString().optional(),
@@ -16,23 +16,28 @@ const validate = (method) => {
                 check('media', "media needs to be in URL format").isURL().optional(),
             ]
         }
-        case 'createArtwork': {
+    } else if (method === 'createArtwork') {
+        {
             return [
-                check('author', "author doesn't exist").isString().not().isEmpty(),
-                check('desc', "Description doesn't exits").isString().not().isEmpty(),
-                check('price', "Price is invalid format").isFloat().not().isEmpty(),
-                check('media', "media needs to be a URL").isURL().not().isEmpty(),
+                check('author').isAlpha().withMessage("Author may only contain letters").not().isEmpty().withMessage("Author field is required"),
+                check('desc').isAlpha().withMessage("Description may only contain letters").not().isEmpty().withMessage("Description field is required"),
+                check('price').isFloat().withMessage("Price needs to be in float format").not().isEmpty().withMessage("Price is required"),
+                check('media').isURL().withMessage("Media field must be in URL format").not().isEmpty().withMessage("Media field is required"),
             ]
         }
-        case 'createUser': {
+    } else if (method === 'createUser') {
+        {
             return [
-                check('user', "Username required").not().isEmpty(),
-                check('pass', "Password required").not().isEmpty(),
-                check('first', "First name can only contain letters").not().isEmpty().isAlpha(),
-                check('last', "Last name can only contain letters").not().isEmpty().isAlpha(),
+                check('user').not().isEmpty().withMessage("Username required").custom((value, {req}) => {
+                    return dbController.check_username(req.body.user).then(result => {if(result) throw new Error("Username Taken")})}),
+                check('pass').not().isEmpty().withMessage("Password required").isLength({min: 8}).withMessage("Password must be minimum 8 characters"),
+                check('first').not().isEmpty().withMessage("First Name Required").isAlpha().withMessage("First name can only contain letters"),
+                check('last').not().isEmpty().withMessage("Last Name Required").isAlpha().withMessage("Last name can only contain letters"),
+
             ]
         }
-        case 'loginUser': {
+    } else if (method === 'loginUser') {
+        {
             return [
                 check('user', "Username required").not().isEmpty(),
                 check('pass', "Password required").not().isEmpty(),

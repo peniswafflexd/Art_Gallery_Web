@@ -7,6 +7,7 @@
     <title>Document</title>
     <%- include('../partials/head'); %>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/order.css" rel="stylesheet" type="text/css">
 
     <script>
         function test(elem){
@@ -14,62 +15,7 @@
             window.location.href = "/order/" + order_id
         }
     </script>
-    <style>
-        .container, table {
-            width: 100%;
-        }
 
-        table * {
-            opacity: 0.9;
-            z-index: 1;
-        }
-
-        img {
-            --img-height: 90px;
-            min-height: var(--img-height);
-            min-width: var(--img-height);
-            max-height: var(--img-height);
-            max-width: var(--img-height);
-            border-style: solid;
-            border-width: 4px;
-            border-color: var(--foreground-black);
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-      .img-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 5px;
-          justify-content: flex-end;
-        }
-
-
-        .art-container {
-            border-width: 10px;
-            border-style: solid;
-            border-color: var(--background-black);
-            background-color: var(--foreground-black);
-            max-height: 20px;
-            cursor: pointer;
-        }
-
-        tr, td * {
-            max-height: 50px !important;
-        }
-
-        tr:hover, tr:hover * {
-            opacity: 1;
-        }
-
-        td {
-            padding-left: 5px;
-        }
-    </style>
 </head>
 <body>
 <header>
@@ -80,13 +26,14 @@
     art objects to pull in the objects into the table
 
 -->
-<% if(!orders.lenth>0){ %>
-    <p>You don't have any orders</p>
-<% } else { %>
-    <h2>Your Orders</h2>
 
     <div class="container">
-        <table>
+        <% if(!orders.length>0){ %>
+            <p>You don't have any orders</p>
+        <% } else { %>
+            <h2>Your Orders</h2>
+
+            <table>
             <tr>
                 <th>Order No.</th>
                 <th>No. Items</th>

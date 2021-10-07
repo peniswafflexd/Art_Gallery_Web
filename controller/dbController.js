@@ -155,6 +155,11 @@ async function make_query(collection, query, single = false, client = admin) {
 
 }
 
+const check_username = async (usernameToFind) => {
+    const query = {username: usernameToFind.toString()}
+    return await make_query("users", query, true);
+}
+
 /*Updates the document corresponding to the ID in the given collection with the
 given update. Backend function that can change anything aside from _id, not for
 general use.
@@ -673,7 +678,8 @@ module.exports = {
     donations_by_artwork,
     donations_by_user,
     get_orders,
-    get_donations
+    get_donations,
+    check_username
 }
 
 //run().catch(console.error);

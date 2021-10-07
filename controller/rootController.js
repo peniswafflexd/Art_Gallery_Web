@@ -41,6 +41,9 @@ const login = (req, res) => {
 
 const root = (req, res) => {
     let artworkObjs =[ ...artworkMap.values() ];
+    artworkObjs.sort((x, y) => {
+        return (x.purchased) ? 1 : -1;
+    })
     res.render('pages/index', {artwork: artworkObjs });
 }
 

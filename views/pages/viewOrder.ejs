@@ -7,67 +7,8 @@
     <title>Document</title>
     <%- include('../partials/head'); %>
     <link href="/css/style.css" rel="stylesheet" type="text/css">
-    <style>
-        .container, table {
-            width: 100%;
-        }
+    <link href="/css/viewOrder.css" rel="stylesheet" type="text/css">
 
-        table * {
-            opacity: 0.9;
-            z-index: 1;
-        }
-
-        img {
-            --img-height: 90px;
-            min-height: var(--img-height);
-            min-width: var(--img-height);
-            max-height: var(--img-height);
-            max-width: var(--img-height);
-            border-style: solid;
-            border-width: 4px;
-            border-color: var(--foreground-black);
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        .img-container0, .img-container1 {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 5px;
-        }
-
-        .img-container0 {
-            justify-content: flex-start;
-        }
-
-        .img-container1 {
-            justify-content: center;
-        }
-
-        .art-container {
-            border-width: 10px;
-            border-style: solid;
-            border-color: var(--background-black);
-            background-color: var(--foreground-black);
-            max-height: 20px;
-        }
-
-        tr, td * {
-            max-height: 50px !important;
-        }
-
-        tr:hover, tr:hover * {
-            opacity: 1;
-        }
-
-        td {
-            padding-left: 5px;
-        }
-    </style>
 </head>
 <body>
 <header>
@@ -76,15 +17,13 @@
 
 <!--Need to add user session checking
     Along with the addition using the server.js and
-    art objects to pull in the objects into the table
-
--->
-<% if(!order){ %>
-    <p>This is not a valid order</p>
-<% } else { %>
-    <h2>Order</h2>
+    art objects to pull in the objects into the table -->
 
     <div class="container">
+        <% if(!order){ %>
+            <p>This is not a valid order</p>
+        <% } else { %>
+            <h2>Order</h2>
         <table>
             <thead>
             <tr>

@@ -6,14 +6,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/registration.css" rel="stylesheet" type="text/css">
+    <script>
+        const parseJsonErrorsToList = (jsonErrors) => {
+            const listElems = jsonErrors.errors.map(err => `<li> ${err.msg} </li>`)
+            return `<ul>${listElems.join(" ")}</ul>`
+        }
+
+        const urlencodeFormData = (fd) => {
+            let s = '';
+
+            function encode(s) {
+                return encodeURIComponent(s).replace(/%20/g, '+');
+            }
+
+            for (let pair of fd.entries()) {
+                if (typeof pair[1] == 'string') {
+                    s += (s ? '&' : '') + encode(pair[0]) + '=' + encode(pair[1]);
+                }
+            }
+            return s;
+        }
+
+        const checkForPasswordErrors = (e, formElem) => {
+            e.preventDefault()
+            const formData = urlencodeFormData(new FormData(formElem));
+            console.log(formData)
+            const xhttp = new XMLHttpRequest();
+            const handleResponse = () => {
+                const response = xhttp.response;
+                const contentType = xhttp.getResponseHeader('content-type')
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+
+                    const data = JSON.parse(response)
+                    let errorDiv = document.getElementById("errors");
+                    errorDiv.innerHTML = parseJsonErrorsToList(data);
+                    errorDiv.hidden = false;
+                } else {
+                    window.location.href = "/";
+                }
+            }
+            xhttp.open("POST", '/sign-up', true)
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send(formData)
+            xhttp.onreadystatechange = handleResponse;
+
+
+        }
+    </script>
 </head>
 <body>
-    <script src="ejs.min.js"></script>
-    <header>
-        <%- include('../partials/nav', {user}); %>
-    </header>
-    <form action="/sign-up" method="post">
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+<div class="container">
+    <form class="form" id="form" method="post" action="/sign-up" enctype="application/x-www-form-urlencoded"
+          onsubmit="checkForPasswordErrors(event, this)">
         <h2>Sign Up</h2>
+
         <div class="input-field">
             <input type="text" name="first" id="first" placeholder="Enter First Name">
         </div>
@@ -26,7 +78,10 @@
         <div class="input-field">
             <input type="password" name="pass" id="pass" placeholder="Enter Password">
         </div>
-        <input type="submit" value="Sign Up">
+        <input type="submit" class="button" name="Sign Up">
     </form>
+    <div id="errors" hidden></div>
+
+</div>
 </body>
 </html>
