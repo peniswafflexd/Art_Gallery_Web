@@ -15,6 +15,11 @@ rootRouter.post("/login", validate('loginUser'), authController.postLogin)
  */
 rootRouter.post('/sign-up', validate("createUser"), authController.postSignup);
 
+rootRouter.get('/password-reset', authController.getResetPassword)
+rootRouter.post('/password-reset/user',validate("checkUserExists"), authController.postResetPasswordEmail)
+rootRouter.get('/password-reset/new-password/:id/:token', authController.getNewPassword)
+rootRouter.post('/password-reset/new-password', validate("newPassword"), authController.setNewPassword)
+
 
 rootRouter.get('/logout', isLoggedIn, rootController.logout);
 

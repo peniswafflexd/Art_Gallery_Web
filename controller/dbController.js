@@ -156,8 +156,10 @@ async function make_query(collection, query, single = false, client = admin) {
 }
 
 const check_username = async (usernameToFind) => {
-    const query = {username: usernameToFind.toString()}
-    return await make_query("users", query, true);
+    const query = {username: usernameToFind}
+    const userData = await make_query("users", query, true);
+    if(!userData?._id) return null;
+    return new User(userData)
 }
 
 /*Updates the document corresponding to the ID in the given collection with the
@@ -174,7 +176,7 @@ update: Object key-pair, new value for the document
 async function update_document(id, collection, update, client = admin) {
 
     let object_id = new mongo.ObjectID(id);
-    query = {
+    let query = {
         _id: object_id
     };
 
@@ -200,7 +202,7 @@ l_name: String, the users last name
 admin: Boolean, determines whether the account is to be an admin account,
 or a regular account
 */
-async function add_user(username, password, f_name, l_name, admin = false) {
+async function add_user(username, password, f_name, l_name, email, admin = false) {
 
     try {
         await login_admin.connect();
@@ -216,6 +218,7 @@ async function add_user(username, password, f_name, l_name, admin = false) {
                 first_name: f_name,
                 last_name: l_name,
                 username: username,
+                email: email,
                 password: hashed_password,
                 admin: admin
             };
@@ -251,7 +254,7 @@ async function user_login(username, password) {
         if (account) {
 
             let test_password = hash(password);
-            if (test_password == account.password) {
+            if (test_password === account.password) {
 
                 return new User(account);
 
@@ -318,6 +321,15 @@ async function get_oauth_token(user_id, website){
 
   return(token);
 
+}
+
+const update_password = (id, password) => {
+    const password_hash = hash(password);
+    const update = {
+        password: password_hash,
+        resetKey: ""
+    }
+    update_document(id, 'users', update).catch(err => console.error(err));
 }
 
 /*Adds an artwork to the collection of artworks
@@ -679,7 +691,10 @@ module.exports = {
     donations_by_user,
     get_orders,
     get_donations,
-    check_username
+    check_username,
+    update_document,
+    get,
+    update_password
 }
 
 //run().catch(console.error);

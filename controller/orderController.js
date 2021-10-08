@@ -1,5 +1,6 @@
-const {Order} = require("../model/Order");
 const dbController = require("./dbController")
+const modelController = require("./modelController")
+
 
 const getOrder = (req, res) => {
     let userOrders = [];
@@ -27,6 +28,9 @@ const addOrder = (req, res) => {
     if (!req.session?.cart?.length > 0) return res.send("You have no items in your cart to purchase")
     const artwork_ids = req.session.cart.map(art => art.id);
     dbController.add_order(req.session.user.id, artwork_ids)
+        .then(() => {
+            dbController.get_all_art().then(art => modelController.populateArtworkMap(art))
+        })
         .catch(err => console.error(err));
     res.redirect("/");
 }
