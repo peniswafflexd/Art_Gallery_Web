@@ -21,7 +21,7 @@ const postArt = (req, res) => {
         return;
     }
     const {author, desc, media, price} = req.body
-    const newArtwork = new Artwork(author, false, desc, media, price, null , false)
+    const newArtwork = new Artwork(author, false, desc, media, price, null , false)//author, false for is saved, desc, media, price, null for id and false for is purchased
     const updateAfterSave = () => {
         setArtistNationality(newArtwork)
             .then(artistNameObj => {
