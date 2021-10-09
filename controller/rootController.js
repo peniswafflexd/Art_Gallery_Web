@@ -1,7 +1,6 @@
 const {artworkMap} = require("../model/Artwork");
 const dbController = require("./dbController");
 
-
 const signup = (req, res) => {
     res.render('pages/registration');
 }
@@ -59,5 +58,5 @@ module.exports = {
     login,
     root,
     logout,
-    signup
+    signup,
 }

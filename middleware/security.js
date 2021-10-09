@@ -19,8 +19,8 @@ const validate = (method) => {
         }
         case 'createArtwork': {
             return [
-                check('author').isAlpha().withMessage("Author may only contain letters").not().isEmpty().withMessage("Author field is required"),
-                check('desc').isAlpha().withMessage("Description may only contain letters").not().isEmpty().withMessage("Description field is required"),
+                check('author').isString().withMessage("Author may only contain letters").not().isEmpty().withMessage("Author field is required"),
+                check('desc').isString().withMessage("Description may only contain letters").not().isEmpty().withMessage("Description field is required"),
                 check('price').isFloat().withMessage("Price needs to be in float format").not().isEmpty().withMessage("Price is required"),
                 check('media').isURL().withMessage("Media field must be in URL format").not().isEmpty().withMessage("Media field is required"),
             ]

@@ -174,7 +174,7 @@ collection: String, name of the collection the target document is in
 update: Object key-pair, new value for the document
 */
 async function update_document(id, collection, update, client = admin) {
-
+    console.log("updating " + id + " in collection " + collection + " with; " + JSON.stringify(update));
     let object_id = new mongo.ObjectID(id);
     let query = {
         _id: object_id
@@ -474,6 +474,7 @@ async function add_donation(user_id, author, description, url, price) {
 
         await art_admin.db("NWEN304").collection("donations").insertOne(new_donation);
 
+        return artwork_id;
     } finally {
         await art_admin.close();
     }

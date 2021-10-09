@@ -1,4 +1,7 @@
 const {validationResult} = require("express-validator");
+const {default: dps} = require("dbpedia-sparql-client");
+const dbController = require("../controller/dbController")
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const handleErrors = (req, res) => {
     let errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
@@ -44,8 +47,35 @@ const sendEmail = (user, token) => {
     });
 }
 
+const setArtistNationality = async (art) => {
+    //SPARQL query to get birthplace of artist
+    const artist = art.author;
+    let nationality = "Unknown";
+    let query = `SELECT DISTINCT`+
+        `?birthcountry `+
+        `WHERE{ ` +
+        `?agent a dbo:Artist;` +
+        `dbo:birthPlace ?birthplace.` +
+        `?birthplace dbo:country ?birthcountry.` +
+        `?agent rdfs:label ?agent_name.` +
+        `FILTER((LANGMATCHES(LANG(?agent_name), "en")) && (REGEX(?agent_name, "${artist}", "i")))` +
+        `} LIMIT 1`
+    let response = await dps.client()
+        .query(query)
+        .timeout(15000) // optional, defaults to 10000
+        .asJson() // or asXml()
+        .catch(err => console.error(err));
+    let resultBindings = response.results.bindings;
+    if(resultBindings[0]) {
+        let birthplaceNameArray = resultBindings[0].birthcountry.value.split('/')
+        nationality = birthplaceNameArray[birthplaceNameArray.length - 1]
+    }
+    return {artist_nationality: nationality};
+}
+
 module.exports = {
     handleErrors,
     sendErrorJson,
-    sendEmail
+    sendEmail,
+    setArtistNationality
 }

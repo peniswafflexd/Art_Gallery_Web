@@ -36,7 +36,10 @@
     <img src="<%= currentArtwork.media_url %>" alt="Artwork"/>
     <div class="info-container">
         <div class="desc-container">
-            <p><b>Author: </b><%= currentArtwork.author %>  </p>
+            <p><b>Artist: </b><%= currentArtwork.author %>  </p>
+            <% if(currentArtwork.artist_nationality) { %>
+                <p><b>Nationality: </b><%= currentArtwork.artist_nationality %>  </p>
+            <% } %>
             <p><b>Description: </b><%= currentArtwork.description %></p>
             <p><b>Price: $</b><%= currentArtwork.price %></p>
         </div>

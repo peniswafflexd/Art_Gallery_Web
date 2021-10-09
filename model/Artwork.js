@@ -25,6 +25,7 @@ class Artwork {
             this.media_url = authorOrObj.media_url;
             this.id = authorOrObj._id.toString().split(`"`)[0]
             this.purchased = authorOrObj.purchased
+            if(authorOrObj.artist_nationality) this.artist_nationality = authorOrObj.artist_nationality
         } else {
             this.author = authorOrObj;
             this.description = desc;
@@ -40,28 +41,35 @@ class Artwork {
         this.dbController = dbController;
     }
 
-    save(userid) {
+    save(userid, callback) {
         if(!this.dbController) return console.error("dbController not set!")
         if(this.isSaved) return;
         this.dbController.add_donation(userid, this.author, this.description, this.media_url, this.price)
-            .then(() => {
+            .then((id) => {
+                this.id = id
                 this.dbController.get_all_art().then(artArray => populateArtworkMap(artArray))
                 this.isSaved = true;
+                callback();
             }).catch(err => {
             console.error(err)
         })
     }
 
-    update(){
+    update(objToUpdate){
         if(!this.dbController) return console.error("dbController not set!")
         const updateObj = {
             price: this.price,
             media_url: this.media_url,
             author: this.author,
             description: this.description,
-            purchased: this.purchased
+            purchased: this.purchased,
+            ...objToUpdate
         }
-        this.dbController.update(this.id, updateObj)
+        console.log("Updating document: " + JSON.stringify(updateObj))
+        this.dbController.update_document(this.id, "artworks", objToUpdate)
+            .then(() => {
+                this.dbController.get_all_art().then(artArray => populateArtworkMap(artArray))
+            })
             .catch(err => console.log(err))
     }
 
@@ -79,6 +87,7 @@ class Artwork {
         })
     }
 }
+
 
 module.exports = {
     ...module.exports,

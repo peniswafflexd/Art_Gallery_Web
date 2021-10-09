@@ -1,6 +1,7 @@
 const {validationResult} = require("express-validator");
 const {artworkMap, Artwork} = require("../model/Artwork")
 const dbController = require("./dbController");
+const {setArtistNationality} = require("../utils/util")
 
 
 const getArt = (req, res) => {
@@ -21,8 +22,14 @@ const postArt = (req, res) => {
     }
     const {author, desc, media, price} = req.body
     const newArtwork = new Artwork(author, false, desc, media, price, null , false)
+    const updateAfterSave = () => {
+        setArtistNationality(newArtwork)
+            .then(artistNameObj => {
+                newArtwork.update(artistNameObj)
+            })
+    }
     newArtwork.setDBController(dbController)
-    newArtwork.save(req.session.user.id);
+    newArtwork.save(req.session.user.id, updateAfterSave);
     res.redirect("/");
 };
 
