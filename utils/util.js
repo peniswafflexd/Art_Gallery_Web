@@ -48,7 +48,7 @@ const sendEmail = (user, token) => {
 }
 
 const getUserGeoLocation = async (req) =>{
-    const testIP = "212.231.188.247";
+    const testIP = req.headers['x-forwarded-for'];
     let location = await fetch(`http://ip-api.com/json/${testIP}`)
         .then(data => data.json().then(location =>{
             return location.country.toString().replace(" ", "_")
