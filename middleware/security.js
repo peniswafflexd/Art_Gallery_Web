@@ -1,5 +1,7 @@
 const {check, body} = require("express-validator");
 const dbController = require("../controller/dbController")
+const jwt = require('jwt-simple')
+const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 const {User} = require("../model/User");
 
 /**
@@ -88,19 +90,45 @@ const updateLocals = (req, res, next) => {
 
 const isLoggedIn = (req, res, next) => {
     if (req.session?.user?.id) next();
+    if (req.body.jwt) {
+        req.contentType = "application/json"
+        const payload = jwt.decode(req.body.jwt, jwtSecret)
+        if(payload.username && payload.id){
+            dbController.check_username(payload.username)
+                .then(user => {
+                    if(user){
+                        if(user.id === payload.id) next();
+                        else {res.status(422).json({err: "Invalid Credentials"})}
+                    }}
+                )
+        }
+    }
     else res.redirect("/login")
 }
 
 const isAdmin = (req, res, next) => {
-    if (req.session?.user?.admin) {
-        console.log("User is an admin")
-        next();
-    } else {
+    if (req.session?.user?.admin) next();
+    if (req.body.jwt) {
+        req.contentType = "application/json"
+        const payload = jwt.decode(req.body.jwt, jwtSecret)
+        if(payload.username && payload.id){
+            dbController.check_username(payload.username)
+                .then(user => {
+                    if(user){
+                        if(user.id === payload.id) {
+                            if(user.admin) next();
+                            else  {res.status(422).json({err: "Insufficient Permissions"})}
+                        }
+                        else {res.status(422).json({err: "Invalid Credentials"})}
+                    }}
+                )
+        }
+    }
+    else {
         console.log("User is NOT an admin")
         res.redirect("/")
     }
 }
-
 
 module.exports = {
     validate,

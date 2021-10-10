@@ -12,31 +12,25 @@ const {rootRouter} = require("./routes/rootRoute")
 const {cartRouter} = require("./routes/cartRoute")
 const {orderRouter} = require("./routes/orderRoute");
 const {populateValidCountries} = require("./utils/util");
-// creating 24 hours from milliseconds
-const ONE_DAY = 1000 * 60 * 60 * 24;
+const {maxAge, httpOnly} = require("express-session/session/cookie");
+const {apiRouter} = require("./routes/apiRoute");
+// creating 20 minutes hours from milliseconds
+const TWENTY_MIN = 1000 * 60 * 20;
 
 //session middleware
 // let session;
 app.use(sessions({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
     saveUninitialized: true,
-    cookie: {maxAge: ONE_DAY},
     resave: false,
+    rolling: true, //allows session rollover if user still making requests
+    cookie: {
+        httpOnly: true,
+        maxAge: TWENTY_MIN
+    }
 }));
 
 app.use(express.static(__dirname + '/public'));
-
-//initialise the body-parser middleware for post requests
-// app.use(function(req, res, next) {
-//     req.rawBody = '';
-//     req.on('data', function(chunk) {
-//         req.rawBody += chunk;
-//     });
-//
-//     req.on('end', function() {
-//         next();
-//     });
-// });
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -46,14 +40,15 @@ app.use(cookieParser());
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-//set the highest level router
+//set the routers
 app.use("/", updateLocals, rootRouter);
 app.use("/art",updateLocals, artRouter)
 app.use("/cart",updateLocals, cartRouter)
 app.use("/order", updateLocals, orderRouter)
+app.use("/api", apiRouter)
 
-// app.locals.user = {ID: null}
 
+//start the server
 app.listen((process.env.PORT || 8080), () => {
     get_all_art().then(data => {
         // app.locals.artwork = data

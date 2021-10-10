@@ -323,6 +323,12 @@ async function get_oauth_token(user_id, website){
 
 }
 
+/**
+ * Updates the password of the user defined by
+ * the given ID with the value of password
+ * @param id - id of user
+ * @param password - new password
+ */
 const update_password = (id, password) => {
     const password_hash = hash(password);
     const update = {

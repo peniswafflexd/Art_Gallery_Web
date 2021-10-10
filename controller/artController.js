@@ -42,7 +42,10 @@ const postArt = (req, res) => {
     }
     newArtwork.setDBController(dbController)
     newArtwork.save(req.session.user.id, updateAfterSave);
-    res.redirect("/");
+    if(req.body.jwt) {
+        res.contentType = "application/json"
+        res.status(200).json({msg: "Operation Successful"})
+    } else res.redirect("/");
 };
 
 /**
@@ -53,13 +56,13 @@ const postArt = (req, res) => {
  */
 const deleteArt = (req, res) => {
     console.log("deleting art")
+    res.contentType = "application/json"
     let artwork_id = req.params.artwork_id
-    if(!req?.session?.user?.admin) res.send("You do not have valid permissions for this")
     let artwork = artworkMap.get(artwork_id)
-    if (!artwork) res.send("Artwork ID doesn't exist");
+    if (!artwork) res.status(422).json({err: "Artwork ID doesn't exist"});
     artwork.setDBController(dbController)
     artwork.delete();
-     res.end("ok")
+     res.status(200).end("ok")
 };
 
 /**

@@ -18,7 +18,7 @@ const addToCart = (req, res) => {
 }
 
 /**
- * Deletes 
+ * Deletes an item from the cart in the users session
  * @param req
  * @param res
  */
