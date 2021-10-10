@@ -90,40 +90,62 @@ const updateLocals = (req, res, next) => {
 
 const isLoggedIn = (req, res, next) => {
     if (req.session?.user?.id) next();
+    else res.redirect("/login")
+}
+
+const hasJWT = (req, res, next) => {
     if (req.body.jwt) {
         req.contentType = "application/json"
-        const payload = jwt.decode(req.body.jwt, jwtSecret)
+        let payload;
+        try{
+            jwt.decode(req.body.jwt, jwtSecret)
+        } catch (err) {
+            return res.status(422).json({err: "Invalid Token"})
+        }
         if(payload.username && payload.id){
             dbController.check_username(payload.username)
                 .then(user => {
                     if(user){
                         if(user.id === payload.id) next();
-                        else {res.status(422).json({err: "Invalid Credentials"})}
+                        else res.status(422).json({err: "Invalid Credentials"})
                     }}
                 )
         }
+        else res.status(422).json({err: "Invalid Credentials"})
     }
-    else res.redirect("/login")
+    else res.status(422).json({err: "Token Required"})
+
 }
 
-const isAdmin = (req, res, next) => {
-    if (req.session?.user?.admin) next();
+const hasAdminJWT = (req, res, next) => {
     if (req.body.jwt) {
         req.contentType = "application/json"
-        const payload = jwt.decode(req.body.jwt, jwtSecret)
+        let payload;
+        try{
+            jwt.decode(req.body.jwt, jwtSecret)
+        } catch (err) {
+            return res.status(422).json({err: "Invalid Token"})
+        }
         if(payload.username && payload.id){
             dbController.check_username(payload.username)
                 .then(user => {
                     if(user){
                         if(user.id === payload.id) {
                             if(user.admin) next();
-                            else  {res.status(422).json({err: "Insufficient Permissions"})}
+                            else res.status(422).json({err: "Insufficient Permissions"})
                         }
-                        else {res.status(422).json({err: "Invalid Credentials"})}
+                        else res.status(422).json({err: "Invalid Credentials"})
                     }}
                 )
         }
+        else res.status(422).json({err: "Invalid Credentials"})
     }
+    else res.status(422).json({err: "Token Required"})
+
+}
+
+const isAdmin = (req, res, next) => {
+    if (req.session?.user?.admin) next();
     else {
         console.log("User is NOT an admin")
         res.redirect("/")
