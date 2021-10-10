@@ -98,7 +98,7 @@ const hasJWT = (req, res, next) => {
         req.contentType = "application/json"
         let payload;
         try{
-            jwt.decode(req.body.jwt, jwtSecret)
+            payload = jwt.decode(req.body.jwt, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
@@ -156,5 +156,7 @@ module.exports = {
     validate,
     updateLocals,
     isLoggedIn,
-    isAdmin
+    isAdmin,
+    hasJWT,
+    hasAdminJWT
 }
