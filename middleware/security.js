@@ -112,6 +112,7 @@ const hasJWT = (req, res, next) => {
                 .then(user => {
                     if(user){
                         if(user.id === payload.id){
+                          req.token = token;
                           req.user = user;
                           next();
                         }
