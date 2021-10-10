@@ -77,20 +77,33 @@ const updateArt = (req, res) => {
         return;
     }
     const artwork_id = req.params.artwork_id
-    const {author, media, desc, price} = req.body;
+    const {author, media, desc, price, nationality} = req.body;
     let artwork = artworkMap.get(artwork_id);
     if (price) artwork.price = price
     if (author) artwork.author = author
     if (media) artwork.media_url = media
     if (desc) artwork.description = desc
+    if (nationality) artwork.artist_nationality = nationality
+
     artwork.setDBController(dbController)
-    artwork.update();
+    artwork.update([]);
     res.redirect("/")
 };
+
+const getUpdate = (req, res) => {
+    const artwork_id = req.params.artwork_id
+    let currentArtwork = artworkMap.get(artwork_id);
+    if (currentArtwork) {
+        res.render("pages/updateArtwork", {currentArtwork, admin: req?.session?.user?.admin});
+    } else {
+        res.send("This is not a valid artwork ID");
+    }
+}
 
 module.exports = {
     getArt,
     postArt,
     deleteArt,
-    updateArt
+    updateArt,
+    getUpdate
 }

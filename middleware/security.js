@@ -17,6 +17,7 @@ const validate = (method) => {
                 check('desc', "Description  is not in string format").isString().optional(),
                 check('price', "Price is invalid format").isFloat().optional(),
                 check('media', "media needs to be in URL format").isURL().optional(),
+                check('nationality', "nationality is not in string format").isString().optional(),
             ]
         }
         case 'createArtwork': {

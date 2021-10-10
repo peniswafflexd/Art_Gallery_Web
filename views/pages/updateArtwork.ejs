@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art</title>
+    <%- include('../partials/head'); %>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/updateArtwork.css" rel="stylesheet" type="text/css">
+    <script>
+        const parseJsonErrorsToList = (jsonErrors) => {
+            const listElems = jsonErrors.errors.map(err => `<li> ${err.msg} </li>`)
+            return `<ul>${listElems.join(" ")}</ul>`
+        }
+
+        const urlencodeFormData = (fd) => {
+            let s = '';
+            function encode(s) {
+                return encodeURIComponent(s).replace(/%20/g, '+');
+            }
+            for (let pair of fd.entries()) {
+                if (typeof pair[1] == 'string') {
+                    s += (s ? '&' : '') + encode(pair[0]) + '=' + encode(pair[1]);
+                }
+            }
+            return s;
+        }
+
+        const checkForPasswordErrors = (e, formElem) => {
+            e.preventDefault()
+            const formData = urlencodeFormData(new FormData(formElem));
+            console.log(formData)
+            const xhttp = new XMLHttpRequest();
+            const handleResponse = () => {
+                const response = xhttp.response;
+                const contentType = xhttp.getResponseHeader('content-type')
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+
+                    const data = JSON.parse(response)
+                    let errorDiv = document.getElementById("errors");
+                    errorDiv.innerHTML = parseJsonErrorsToList(data);
+                    errorDiv.hidden = false;
+                } else {
+                    window.location.href = "/art/<%= currentArtwork.id%>";
+                }
+            }
+            xhttp.open("POST", "/art/<%= currentArtwork.id%>/update", true)
+            xhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhttp.send(formData)
+            xhttp.onreadystatechange = handleResponse;
+
+        }
+        const change = () => {
+            let URLInputRef = document.getElementById("media")
+            let imgRef = document.getElementById("preview")
+            imgRef.src = URLInputRef.value;
+            imgRef.hidden = false;
+        }
+    </script>
+
+</head>
+<body>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+
+<div class="container">
+    <img src="<%= currentArtwork.media_url %>" id="preview" alt="Artwork"/>
+    <div class="info-container">
+        <form class="desc-container" enctype="application/x-www-form-urlencoded" onsubmit="updateArt()">
+            <p><b>Artist: </b><input type="text" name="author" id="author" placeholder="<%= currentArtwork.author %>"> </p>
+            <p><b>Nationality: </b><input type="text" name="nationality" id="nationality"  placeholder="<%= currentArtwork.artist_nationality %>"></p>
+            <p><b>Description: </b><input type="text" name="desc" id="desc" placeholder="<%= currentArtwork.description %>"></p>
+            <p><b>Media URL: </b><input type="url" name="media" id="media" onchange="change()" placeholder="<%= currentArtwork.media_url %>"></p>
+            <p><b>Price: $</b><input type="number" name="price" id="price" placeholder="<%= currentArtwork.price %>"></p>
+            <div id="errors"></div>
+        <div class="button-container">
+            <Button type="submit" name="update" title="update" value="update">Update</Button>
+        </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

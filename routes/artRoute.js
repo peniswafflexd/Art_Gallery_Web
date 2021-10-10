@@ -18,12 +18,15 @@ artRouter.delete("/:artwork_id", isAdmin, artController.deleteArt)
  * Updates the artwork specified by the artwork id. Takes
  * four optional parameters
  */
-artRouter.put("/:artwork_id", isAdmin, validate("updateArtwork"), artController.updateArt);
+artRouter.post("/:artwork_id/update", isAdmin, artController.updateArt)
 
 /**
  * Returns page of the artwork from the given artwork ID in the
  * URL
  */
 artRouter.get("/:artwork_id", artController.getArt)
+
+artRouter.get("/:artwork_id/update", isAdmin, artController.getUpdate)
+
 
 module.exports = {artRouter}
