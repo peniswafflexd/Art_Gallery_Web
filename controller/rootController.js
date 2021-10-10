@@ -2,9 +2,10 @@ const {artworkMap} = require("../model/Artwork");
 const dbController = require("./dbController");
 
 const recommended = (req, res) => {
-    let matchingArt;
-    if(req.session?.location) {
+    let matchingArt = [];
+    if(req?.session?.location) {
         matchingArt = Array.from(artworkMap.values()).filter(art => {
+            if(!art.artist_nationality) return false;
             let nationality = art.artist_nationality
             if(art.artist_nationality.includes("_")) {
                 nationality = art.artist_nationality.replace("_", " ")
