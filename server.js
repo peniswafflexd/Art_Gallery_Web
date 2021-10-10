@@ -54,7 +54,7 @@ app.use("/order", updateLocals, orderRouter)
 
 // app.locals.user = {ID: null}
 
-app.listen(8080, () => {
+app.listen((process.env.PORT || 8080), () => {
     get_all_art().then(data => {
         // app.locals.artwork = data
         populateArtworkMap(data)
