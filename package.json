@@ -25,9 +25,8 @@
     "mongodb": "^4.1.2",
     "node-fetch": "^3.0.0",
     "nodemailer": "^6.6.5",
-    "scrypt-js": "^3.0.1"
-  },
-  "devDependencies": {
+    "scrypt-js": "^3.0.1",
     "express-validator": "^6.12.2"
+
   }
 }

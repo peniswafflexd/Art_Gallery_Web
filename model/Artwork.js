@@ -73,15 +73,13 @@ class Artwork {
     }
 
     delete() {
-        if(!this.dbController) return console.error("dbController not set!")
+        if(!this.dbController) return console.error("dbController not set!!");
         this.dbController.remove_artwork(this.id)
             .then(() => {
                 console.log("deleting " + this.id)
                 this.dbController.get_all_art().then(data => populateArtworkMap(data));
                 artworkMap.delete(this.id)
             }).catch(err => {
-            // if (err === "artwork_in_donations")
-            // else if (err === "artwork_in_orders") res.send("Cannot delete this artwork")
             console.error(err);
         })
     }

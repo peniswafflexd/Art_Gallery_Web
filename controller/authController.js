@@ -68,7 +68,7 @@ const setNewPassword = (req, res) => {
     if (!handleErrors(req, res)) return;
     let token = req.body.token;
     const payload = jwt.decode(token, jwtSecret);
-    if(payload.id !== req.user.id || payload.key !== req.user.resetKey) return res.send("Not valid!")
+    if (payload.id !== req.user.id || payload.key !== req.user.resetKey) return res.send("Not valid!")
     update_password(req.user.id, req.body.pass);
     res.send("Password Reset!")
 }
@@ -83,7 +83,7 @@ const getNewPassword = (req, res) => {
             const payload = jwt.decode(token, jwtSecret)
             if (user.id !== id || payload.key !== user.resetKey) return res.send("Not Valid")
             res.render('pages/newPassword', {id: id, token: token})
-        }).catch(err => console.log("getNewPassword "+err))
+        }).catch(err => console.log("getNewPassword " + err))
 
 }
 

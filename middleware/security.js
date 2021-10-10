@@ -58,12 +58,12 @@ const validate = (method) => {
             return [
                 check('pass').not().isEmpty().withMessage("Password required").isLength({min: 8}).withMessage("Password must be minimum 8 characters"),
                 check('pass2').not().isEmpty().withMessage("Password required").custom((value, {req}) => {
-                    if(req.body.pass !== value) throw new Error("Passwords need to match!")
+                    if (req.body.pass !== value) throw new Error("Passwords need to match!")
                     else return true;
                 }),
                 check('id').custom((val, {req}) => {
-                  return dbController.get(val, 'users').then(userData => {
-                        if(!userData) throw new Error("Not a valid ID!")
+                    return dbController.get(val, 'users').then(userData => {
+                        if (!userData) throw new Error("Not a valid ID!")
                         else {
                             req.user = new User(userData)
                             return true;
@@ -71,7 +71,7 @@ const validate = (method) => {
                     })
                 }),
                 check('token').not().isEmpty().withMessage("JWT Token expected!")
-                ]
+            ]
         }
     }
 }
