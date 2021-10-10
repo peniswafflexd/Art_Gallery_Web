@@ -41,7 +41,7 @@ const postArt = (req, res) => {
             })
     }
     newArtwork.setDBController(dbController)
-    newArtwork.save(req.session.user.id, updateAfterSave);
+    newArtwork.save(req.user.id, updateAfterSave);
     if(req.body.jwt) {
         res.contentType = "application/json"
         res.status(200).json({msg: "Operation Successful"})

@@ -89,7 +89,10 @@ const updateLocals = (req, res, next) => {
 }
 
 const isLoggedIn = (req, res, next) => {
-    if (req.session?.user?.id) next();
+    if (req.session?.user?.id){
+      req.user = req.session.user;
+        next();
+    }
     else res.redirect("/login")
 }
 
@@ -108,7 +111,10 @@ const hasJWT = (req, res, next) => {
             dbController.check_username(payload.username)
                 .then(user => {
                     if(user){
-                        if(user.id === payload.id) next();
+                        if(user.id === payload.id){
+                          req.user = user;
+                          next();
+                        }
                         else res.status(422).json({err: "Invalid Credentials"})
                     }}
                 )
@@ -126,7 +132,7 @@ const hasAdminJWT = (req, res, next) => {
         req.contentType = "application/json"
         let payload;
         try{
-            jwt.decode(token, jwtSecret)
+            payload = jwt.decode(token, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
