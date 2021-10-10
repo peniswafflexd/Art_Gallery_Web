@@ -59,8 +59,9 @@ const postResetPasswordEmail = (req, res) => {
     let token = jwt.encode(payload, jwtSecret);
     sendEmail(user, token);
     user.passwordResetKey(key);
-    res.contentType = "application/json"
-    res.status(200).send({token: token, id: user.id})
+    res.redirect("/login")
+    // res.contentType = "application/json"
+    // res.status(200).send({token: token, id: user.id})
 
 }
 

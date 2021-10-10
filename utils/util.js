@@ -2,6 +2,7 @@ const {validationResult} = require("express-validator");
 const {default: dps} = require("dbpedia-sparql-client");
 const dbController = require("../controller/dbController")
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const WebRoot = "https://artgallery-team7.herokuapp.com/"
 
 const handleErrors = (req, res) => {
     let errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
@@ -34,8 +35,7 @@ const sendEmail = (user, token) => {
         from: 'nwengallerytesting@gmail.com',
         to: 'tinnyfacexd@gmail.com',
         subject: 'Password Reset Link',
-        text: `Here is your password reset link!`,
-        html: `Here is your password reset link! <a href="http://localhost:8080/password-reset/new-password/${user.id}/${token}">Reset Password</a>`
+        html: `Here is your password reset link! <a href="${WebRoot}/password-reset/new-password/${user.id}/${token}">Reset Password</a>`
     };
 
     transporter.sendMail(mailOptions, function(error, info){
