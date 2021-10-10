@@ -4,7 +4,13 @@ const dbController = require("./dbController");
 const recommended = (req, res) => {
     let matchingArt;
     if(req.session?.location) {
-        matchingArt = Array.from(artworkMap.values()).filter(art => art.artist_nationality === req.session.location)
+        matchingArt = Array.from(artworkMap.values()).filter(art => {
+            let nationality = art.artist_nationality
+            if(art.artist_nationality.includes("_")) {
+                nationality = art.artist_nationality.replace("_", " ")
+            }
+            return nationality === req.session.location
+        })
     }
     res.render('pages/recommended' , {artwork: matchingArt});
 }

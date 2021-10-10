@@ -5,6 +5,13 @@ const jwt = require('jwt-simple')
 const {User} = require("../model/User");
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 
+/**
+ * Logs a user in and creates a session for them
+ * also adds their location to the session for
+ * recommendations
+ * @param req
+ * @param res
+ */
 const postLogin = (req, res) => {
     if (!handleErrors(req, res)) return;
     const {user, pass} = req.body;
@@ -26,6 +33,12 @@ const postLogin = (req, res) => {
         })
 }
 
+/**
+ * Creates a new user and stores it in the
+ * database
+ * @param req
+ * @param res
+ */
 const postSignup = (req, res) => {
     if (!handleErrors(req, res)) return;
     const {user, pass, first, last, email} = req.body;
@@ -41,10 +54,25 @@ const postSignup = (req, res) => {
     })
 }
 
+/**
+ * sends the reset password page that prompts
+ * for the username
+ * @param req
+ * @param res
+ */
 const getResetPassword = (req, res) => {
     res.render('pages/resetPasswordEmail');
 }
 
+/**
+ * gets the users username when resetting their
+ * password and assigns them a one time dynamic
+ * token and emails a reset link to the users
+ * linked email address. Stores the token in
+ * the user document in the database.
+ * @param req
+ * @param res
+ */
 const postResetPasswordEmail = (req, res) => {
     if (!handleErrors(req, res)) return;
     const user = req.user;
@@ -65,6 +93,14 @@ const postResetPasswordEmail = (req, res) => {
 
 }
 
+/**
+ * Gets the new password from the user and
+ * checks the decoded token matches the user
+ * token before changing the users password
+ * @param req
+ * @param res
+ * @returns {*}
+ */
 const setNewPassword = (req, res) => {
     if (!handleErrors(req, res)) return;
     let token = req.body.token;
@@ -74,6 +110,14 @@ const setNewPassword = (req, res) => {
     res.send("Password Reset!")
 }
 
+/**
+ * gets the page to input the new password
+ * on password reset. Checks to see if the
+ * users token and id match with whats in the
+ * URL.
+ * @param req
+ * @param res
+ */
 const getNewPassword = (req, res) => {
     const {id, token} = req.params;
     let user;

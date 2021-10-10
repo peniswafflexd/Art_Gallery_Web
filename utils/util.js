@@ -51,7 +51,7 @@ const getUserGeoLocation = async (req) =>{
     const testIP = req.headers['x-forwarded-for'];
     let location = await fetch(`http://ip-api.com/json/${testIP}`)
         .then(data => data.json().then(location =>{
-            return location.country.toString().replace(" ", "_")
+            return location.country.toString()
         })).catch(err => console.error(err))
     return location;
 }
@@ -78,6 +78,7 @@ const setArtistNationality = async (art) => {
     if(resultBindings[0]) {
         let birthplaceNameArray = resultBindings[0].birthcountry.value.split('/')
         nationality = birthplaceNameArray[birthplaceNameArray.length - 1]
+        nationality = nationality.replace('_', " ")
     }
     return {artist_nationality: nationality};
 }

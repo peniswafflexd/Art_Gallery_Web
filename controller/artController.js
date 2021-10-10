@@ -3,7 +3,12 @@ const {artworkMap, Artwork} = require("../model/Artwork")
 const dbController = require("./dbController");
 const {setArtistNationality} = require("../utils/util")
 
-
+/**
+ * Gets a single art item from the ID in the
+ * URL and displays it to the user
+ * @param req
+ * @param res
+ */
 const getArt = (req, res) => {
     const artwork_id = req.params.artwork_id
     let currentArtwork = artworkMap.get(artwork_id);
@@ -14,6 +19,13 @@ const getArt = (req, res) => {
     }
 };
 
+/**
+ * Adds a donation to the database,
+ * also dynamically gets the artists
+ * nationality and stores it in the database
+ * @param req
+ * @param res
+ */
 const postArt = (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
@@ -33,6 +45,12 @@ const postArt = (req, res) => {
     res.redirect("/");
 };
 
+/**
+ * deletes a piece of art if it is not in
+ * a donation or an order
+ * @param req
+ * @param res
+ */
 const deleteArt = (req, res) => {
     console.log("deleting art")
     let artwork_id = req.params.artwork_id
@@ -44,6 +62,11 @@ const deleteArt = (req, res) => {
      res.end("ok")
 };
 
+/**
+ * Updates a piece of art
+ * @param req
+ * @param res
+ */
 const updateArt = (req, res) => {
     const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object
     if (!errors.isEmpty()) {
