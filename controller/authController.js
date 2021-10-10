@@ -1,5 +1,5 @@
 const {user_login, add_user, update_password} = require("./dbController");
-const {handleErrors, sendErrorJson, sendEmail} = require("../utils/util");
+const {handleErrors, sendErrorJson, sendEmail, getUserGeoLocation} = require("../utils/util");
 const dbController = require('./dbController')
 const jwt = require('jwt-simple')
 const {User} = require("../model/User");
@@ -13,8 +13,12 @@ const postLogin = (req, res) => {
             req.session.userid = user;
             req.session.user = data
             res.locals.user = data;
-            console.log(`${user} logged in!`);
-            res.redirect("/");
+            getUserGeoLocation(req).then(location => {
+                req.session.location = location
+                console.log("set " + user + " location " + location)
+                console.log(`${user} logged in!`);
+                res.redirect("/");
+            })
         })
         .catch(err => {
             sendErrorJson(res, err);

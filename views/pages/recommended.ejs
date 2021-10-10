@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <%- include('../partials/head'); %>
+    <script>
+        const errorImg = "https://www.google.com/search?q=no+image&rlz=1C1CHBD_enNZ962NZ962&sxsrf=AOaemvI3hfd-dnV8Dow55eqW9jQs8xPkng:1633055146285&source=lnms&tbm=isch&sa=X&ved=2ahUKEwj1vpG_lKjzAhXz4XMBHYt5BsoQ_AUoAXoECAEQAw&biw=1433&bih=668&dpr=2.68#imgrc=-QpL1I7u3zbiBM"
+    </script>
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/index.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+<script src="ejs.min.js"></script>
+<header>
+    <%- include('../partials/nav', {user}); %>
+</header>
+<div class="container">
+    <% if(artwork.length < 1) {%>
+        <h1>Sorry we don't have any recommendations for you</h1>
+    <% } else { %>
+    <div class="row">
+        <div class="col-sm">
+            <% for (let i = 0; i < artwork.length; i += 3) { %>
+                <% if(artwork[i].id) { %>
+                    <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
+                        <% if(artwork[i].purchased) { %>
+                            <div class="purchased-cont">
+                                <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                                <div class="purchased-overlay"></div>
+                            </div>
+                        <% } else { %>
+                            <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                        <% } %>
+                        <div class="text-view">
+                            <p class="author">Artist: <%= artwork[i].author %></p>
+                            <p class="price">Price: $<%= artwork[i].price %></p>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+        <div class="col-sm">
+            <% for (let i = 1; i < artwork.length; i += 3) { %>
+                <% if(artwork[i].id) { %>
+
+                    <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
+                        <% if(artwork[i].purchased) { %>
+                            <div class="purchased-cont">
+                                <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                                <div class="purchased-overlay"></div>
+                            </div>
+                        <% } else { %>
+                            <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                        <% } %>
+                        <div class="text-view">
+                            <p class="author">Artist: <%= artwork[i].author %></p>
+                            <p>Price: $<%= artwork[i].price %></p>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+
+        </div>
+        <div class="col-sm">
+            <% for (let i = 2; i < artwork.length; i += 3) { %>
+                <% if(artwork[i].id) { %>
+                    <div class="imageCont" onclick="window.location.href = '/art/<%= artwork[i].id %>'">
+                        <% if(artwork[i].purchased) { %>
+                            <div class="purchased-cont">
+                                <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                                <div class="purchased-overlay"></div>
+                            </div>
+                        <% } else { %>
+                            <img class="gall-img" src="<%= artwork[i].media_url %>"/>
+                        <% } %>
+
+                        <div class="text-view">
+                            <p class="author">Artist: <%= artwork[i].author %></p>
+                            <p>Price: $<%= artwork[i].price %></p>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+
+        </div>
+    </div>
+    <% } %>
+
+</div>
+</body>
+</html>

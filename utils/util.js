@@ -47,6 +47,15 @@ const sendEmail = (user, token) => {
     });
 }
 
+const getUserGeoLocation = async (req) =>{
+    const testIP = "212.231.188.247";
+    let location = await fetch(`http://ip-api.com/json/${testIP}`)
+        .then(data => data.json().then(location =>{
+            return location.country.toString().replace(" ", "_")
+        })).catch(err => console.error(err))
+    return location;
+}
+
 const setArtistNationality = async (art) => {
     //SPARQL query to get birthplace of artist
     const artist = art.author;
@@ -77,5 +86,6 @@ module.exports = {
     handleErrors,
     sendErrorJson,
     sendEmail,
-    setArtistNationality
+    setArtistNationality,
+    getUserGeoLocation
 }

@@ -65,7 +65,6 @@ class Artwork {
             purchased: this.purchased,
             ...objToUpdate
         }
-        console.log("Updating document: " + JSON.stringify(updateObj))
         this.dbController.update_document(this.id, "artworks", objToUpdate)
             .then(() => {
                 this.dbController.get_all_art().then(artArray => populateArtworkMap(artArray))

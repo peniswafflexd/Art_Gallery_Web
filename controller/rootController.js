@@ -1,6 +1,14 @@
 const {artworkMap} = require("../model/Artwork");
 const dbController = require("./dbController");
 
+const recommended = (req, res) => {
+    let matchingArt;
+    if(req.session?.location) {
+        matchingArt = Array.from(artworkMap.values()).filter(art => art.artist_nationality === req.session.location)
+    }
+    res.render('pages/recommended' , {artwork: matchingArt});
+}
+
 const signup = (req, res) => {
     res.render('pages/registration');
 }
@@ -59,4 +67,5 @@ module.exports = {
     root,
     logout,
     signup,
+    recommended
 }
