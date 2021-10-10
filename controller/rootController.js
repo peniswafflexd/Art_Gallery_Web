@@ -6,6 +6,7 @@ const recommended = (req, res) => {
     if(req?.session?.location) {
         matchingArt = Array.from(artworkMap.values()).filter(art => {
             if(!art.artist_nationality) return false;
+            if(art.purchased) return false
             let nationality = art.artist_nationality
             if(art.artist_nationality.includes("_")) {
                 nationality = art.artist_nationality.replace("_", " ")
