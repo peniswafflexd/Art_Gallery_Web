@@ -94,11 +94,13 @@ const isLoggedIn = (req, res, next) => {
 }
 
 const hasJWT = (req, res, next) => {
-    if (req.body.jwt) {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
         req.contentType = "application/json"
         let payload;
         try{
-            payload = jwt.decode(req.body.jwt, jwtSecret)
+            payload = jwt.decode(token, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
@@ -118,11 +120,13 @@ const hasJWT = (req, res, next) => {
 }
 
 const hasAdminJWT = (req, res, next) => {
-    if (req.body.jwt) {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
         req.contentType = "application/json"
         let payload;
         try{
-            jwt.decode(req.body.jwt, jwtSecret)
+            jwt.decode(token, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
