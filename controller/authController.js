@@ -92,7 +92,8 @@ const oauthGithubCallback = (req, res) => {
 }
 
 const oauthCallbackSuccess = (req, res) => {
-    let apiURLS = [`https://api.github.com/user`,`https://api.github.com/user/emails`]
+    //,`https://api.github.com/user/emails`
+    let apiURLS = [`https://api.github.com/user`]
     let userData = {};
     let requests = apiURLS.map(url => axios.get(url, {
         headers: {
