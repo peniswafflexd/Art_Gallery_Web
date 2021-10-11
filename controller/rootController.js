@@ -48,11 +48,6 @@ const donate = (req, res) => {
         })
 }
 
-const login = (req, res) => {
-    res.render('pages/login');
-}
-
-
 
 const root = (req, res) => {
     let artworkObjs =[ ...artworkMap.values() ];
@@ -71,7 +66,6 @@ const logout = (req, res) => {
 module.exports = {
     cart,
     donate,
-    login,
     root,
     logout,
     signup,

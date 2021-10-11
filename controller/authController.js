@@ -3,8 +3,13 @@ const {handleErrors, sendErrorJson, sendEmail, getUserGeoLocation} = require("..
 const dbController = require('./dbController')
 const jwt = require('jwt-simple')
 const {User} = require("../model/User");
+const axios = require("axios");
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 
+const clientID = 'c5f7827886b1acd5c1aa'
+const clientSecret = '2e2c0bf6ea2432e0edf8cec59445b96a55c266a3'
+
+let githubAccessToken = "";
 /**
  * Logs a user in and creates a session for them
  * also adds their location to the session for
@@ -63,6 +68,41 @@ const postSignup = (req, res) => {
 const getResetPassword = (req, res) => {
     res.render('pages/resetPasswordEmail');
 }
+
+const login = (req, res) => {
+    res.render('pages/login', {client_id: clientID});
+}
+
+const oauthGithubCallback = (req, res) => {
+    // The req.query object has the query params that were sent to this route.
+    const requestToken = req.query.code
+
+    axios({
+        method: 'post',
+        url: `https://github.com/login/oauth/access_token?client_id=${clientID}&client_secret=${clientSecret}&code=${requestToken}`,
+        // Set the content type header, so that we get the response in JSON
+        headers: {
+            accept: 'application/json'
+        }
+    }).then((response) => {
+        githubAccessToken = response.data.access_token
+        res.redirect('/oauth/success');
+    })
+}
+
+
+const oauthCallbackSuccess = (req, res) => {
+    axios({
+        method: 'get',
+        url: `https://api.github.com/user`,
+        headers: {
+            Authorization: 'token ' + githubAccessToken
+        }
+    }).then((response) => {
+        res.render('pages/success',{ userData: response.data });
+    })
+}
+
 
 /**
  * gets the users username when resetting their
@@ -138,5 +178,8 @@ module.exports = {
     getResetPassword,
     setNewPassword,
     getNewPassword,
-    postResetPasswordEmail
+    postResetPasswordEmail,
+    login,
+    oauthGithubCallback,
+    oauthCallbackSuccess
 }

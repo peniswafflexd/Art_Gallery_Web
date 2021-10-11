@@ -14,6 +14,7 @@ const {orderRouter} = require("./routes/orderRoute");
 const {populateValidCountries} = require("./utils/util");
 const {maxAge, httpOnly} = require("express-session/session/cookie");
 const {apiRouter} = require("./routes/apiRoute");
+const {oauthRouter} = require("./routes/oauthRouter");
 // creating 20 minutes hours from milliseconds
 const TWENTY_MIN = 1000 * 60 * 20;
 
@@ -45,6 +46,7 @@ app.use("/", updateLocals, rootRouter);
 app.use("/art",updateLocals, artRouter)
 app.use("/cart",updateLocals, cartRouter)
 app.use("/order", updateLocals, orderRouter)
+app.use("/oauth", oauthRouter)
 app.use("/api", apiRouter)
 
 
