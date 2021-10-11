@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
   "repository": {
@@ -21,12 +21,14 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "express-validator": "^6.12.2",
     "jwt-simple": "^0.5.6",
     "mongodb": "^4.1.2",
     "node-fetch": "^3.0.0",
     "nodemailer": "^6.6.5",
-    "scrypt-js": "^3.0.1",
-    "express-validator": "^6.12.2"
-
+    "scrypt-js": "^3.0.1"
+  },
+  "devDependencies": {
+    "mocha": "^9.1.2"
   }
 }
