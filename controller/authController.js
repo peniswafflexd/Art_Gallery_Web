@@ -103,7 +103,7 @@ const oauthCallbackSuccess = (req, res) => {
 
     axios.all(requests).then((...response) => {
         userData = {response}
-        res.send(userData)
+        res.send(response)
     }).catch((err) => {
         res.send({err: err})
     }).finally(() => {
