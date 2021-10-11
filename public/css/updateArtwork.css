@@ -25,6 +25,7 @@ li {
 
 
 img {
+    object-fit: contain;
     margin: 10px;
     width: 50%;
     height: auto;
@@ -33,7 +34,7 @@ img {
 
 .info-container {
     margin: 10px;
-    min-height: 100%;
+    min-height: max-content;
     width: 50%;
     display: flex;
     flex-direction: column;
@@ -47,6 +48,11 @@ img {
 .desc-container {
     flex: 0.8;
     padding: 10px;
+    min-height: min-content;
+    position:relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
 
 .button-container {
@@ -57,6 +63,20 @@ img {
     margin: 0;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+
+input, textarea {
+    border-radius: 5px;
+    background-color: var(--dark-foreground-black);
+    color: var(--primary-blue);
+    align-self: center;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    position: relative;
+    margin-bottom: 10px;
 }
 
 .button {
@@ -72,5 +92,6 @@ Button {
 }
 
 b {
-    color: var(--primary-blue)
+    color: var(--primary-blue);
 }
+
