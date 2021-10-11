@@ -101,7 +101,8 @@ const oauthCallbackSuccess = (req, res) => {
     }))
 
     Promise.all(requests).then((response) => {
-        userData = {response, ...userData}
+        console.log(response)
+        userData = {data: response.data}
     }).catch((err) => {
         console.error(err)
     }).finally(() => {
