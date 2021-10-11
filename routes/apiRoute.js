@@ -10,4 +10,4 @@ apiRouter.post("/art", hasJWT, validate("createArtwork"), apiController.addDonat
 
 module.exports = {
     apiRouter
-}
+};
