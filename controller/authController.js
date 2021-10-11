@@ -90,7 +90,6 @@ const oauthGithubCallback = (req, res) => {
     })
 }
 
-
 const oauthCallbackSuccess = (req, res) => {
     axios({
         method: 'get',
