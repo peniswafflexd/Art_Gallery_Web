@@ -132,7 +132,6 @@ const oauthCallbackSuccess = (req, res) => {
                 if (userObj) {
                     req.session.user = userObj;
                     console.log("logging in " + userData.login)
-                    getUserGeoLocation(req).then(country => req.session.location = country)
                     return res.redirect('/')
                 } else {
                     const randomPassword = (Math.random().toString(36).slice(-8)) + new Date().getMilliseconds()
@@ -141,7 +140,6 @@ const oauthCallbackSuccess = (req, res) => {
                         .then(user => {
                             req.session.user = user
                             console.log("creating user " + user.username)
-                            getUserGeoLocation(req).then(country => req.session.location = country)
                             return res.redirect("/")
                         }).catch(err => console.error(err));
                 }

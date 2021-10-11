@@ -2,7 +2,7 @@ const express = require("express");
 const rootController = require("../controller/rootController");
 const rootRouter = express.Router()
 const authController = require("../controller/authController")
-const {validate, isAdmin, isLoggedIn} = require("../middleware/security");
+const {validate, isAdmin, isLoggedIn, hasLocation} = require("../middleware/security");
 
 /**
  * Logs a user in, and redirects them to the index page
@@ -16,10 +16,15 @@ rootRouter.post("/login", validate('loginUser'), authController.postLogin)
 rootRouter.post('/sign-up', validate("createUser"), authController.postSignup);
 
 rootRouter.get('/password-reset', authController.getResetPassword)
+
 rootRouter.post('/password-reset/user',validate("checkUserExists"), authController.postResetPasswordEmail)
+
 rootRouter.get('/password-reset/new-password/:id/:token', authController.getNewPassword)
+
 rootRouter.post('/password-reset/new-password', validate("newPassword"), authController.setNewPassword)
-rootRouter.get('/recommended', rootController.recommended)
+
+rootRouter.get('/recommended', hasLocation, rootController.recommended)
+
 rootRouter.get('/logout', isLoggedIn, rootController.logout);
 
 rootRouter.get('/sign-up', rootController.signup);

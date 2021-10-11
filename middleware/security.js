@@ -3,6 +3,7 @@ const dbController = require("../controller/dbController")
 const jwt = require('jwt-simple')
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 const {User} = require("../model/User");
+const {getUserGeoLocation} = require("../utils/util");
 
 /**
  * returns validation handler array for a method
@@ -90,11 +91,10 @@ const updateLocals = (req, res, next) => {
 }
 
 const isLoggedIn = (req, res, next) => {
-    if (req.session?.user?.id){
-      req.user = req.session.user;
+    if (req.session?.user?.id) {
+        req.user = req.session.user;
         next();
-    }
-    else res.redirect("/login")
+    } else res.redirect("/login")
 }
 
 const hasJWT = (req, res, next) => {
@@ -103,27 +103,25 @@ const hasJWT = (req, res, next) => {
         const token = authHeader.split(' ')[1];
         req.contentType = "application/json"
         let payload;
-        try{
+        try {
             payload = jwt.decode(token, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
-        if(payload.username && payload.id){
+        if (payload.username && payload.id) {
             dbController.check_username(payload.username)
                 .then(user => {
-                    if(user){
-                        if(user.id === payload.id){
-                          req.token = token;
-                          req.user = user;
-                          next();
+                        if (user) {
+                            if (user.id === payload.id) {
+                                req.token = token;
+                                req.user = user;
+                                next();
+                            } else res.status(422).json({err: "Invalid Credentials"})
                         }
-                        else res.status(422).json({err: "Invalid Credentials"})
-                    }}
+                    }
                 )
-        }
-        else res.status(422).json({err: "Invalid Credentials"})
-    }
-    else res.status(422).json({err: "Token Required"})
+        } else res.status(422).json({err: "Invalid Credentials"})
+    } else res.status(422).json({err: "Token Required"})
 
 }
 
@@ -133,26 +131,24 @@ const hasAdminJWT = (req, res, next) => {
         const token = authHeader.split(' ')[1];
         req.contentType = "application/json"
         let payload;
-        try{
+        try {
             payload = jwt.decode(token, jwtSecret)
         } catch (err) {
             return res.status(422).json({err: "Invalid Token"})
         }
-        if(payload.username && payload.id){
+        if (payload.username && payload.id) {
             dbController.check_username(payload.username)
                 .then(user => {
-                    if(user){
-                        if(user.id === payload.id) {
-                            if(user.admin) next();
-                            else res.status(422).json({err: "Insufficient Permissions"})
+                        if (user) {
+                            if (user.id === payload.id) {
+                                if (user.admin) next();
+                                else res.status(422).json({err: "Insufficient Permissions"})
+                            } else res.status(422).json({err: "Invalid Credentials"})
                         }
-                        else res.status(422).json({err: "Invalid Credentials"})
-                    }}
+                    }
                 )
-        }
-        else res.status(422).json({err: "Invalid Credentials"})
-    }
-    else res.status(422).json({err: "Token Required"})
+        } else res.status(422).json({err: "Invalid Credentials"})
+    } else res.status(422).json({err: "Token Required"})
 
 }
 
@@ -164,11 +160,20 @@ const isAdmin = (req, res, next) => {
     }
 }
 
+const hasLocation = (req, res, next) => {
+    if (!req?.session?.location) getUserGeoLocation(req).then(country => {
+            req.session.location = country;
+            next();
+        })
+    else next();
+}
+
 module.exports = {
     validate,
     updateLocals,
     isLoggedIn,
     isAdmin,
     hasJWT,
-    hasAdminJWT
+    hasAdminJWT,
+    hasLocation
 }

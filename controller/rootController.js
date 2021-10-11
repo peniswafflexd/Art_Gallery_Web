@@ -1,5 +1,6 @@
 const {artworkMap} = require("../model/Artwork");
 const dbController = require("./dbController");
+const {getUserGeoLocation} = require("../utils/util");
 
 const recommended = (req, res) => {
     let matchingArt = [];
