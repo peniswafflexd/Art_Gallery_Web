@@ -27,7 +27,7 @@
             return s;
         }
 
-        const checkForPasswordErrors = (e, formElem) => {
+        const updateArt = (e, formElem) => {
             e.preventDefault()
             const formData = urlencodeFormData(new FormData(formElem));
             console.log(formData)
@@ -68,13 +68,13 @@
 <div class="container">
     <img src="<%= currentArtwork.media_url %>" id="preview" alt="Artwork"/>
     <div class="info-container">
-        <form class="desc-container" enctype="application/x-www-form-urlencoded" onsubmit="updateArt()">
+        <form class="desc-container" enctype="application/x-www-form-urlencoded" onsubmit="updateArt(event, this)">
             <p><b>Artist: </b><input type="text" name="author" id="author" placeholder="<%= currentArtwork.author %>"> </p>
             <p><b>Nationality: </b><input type="text" name="nationality" id="nationality"  placeholder="<%= currentArtwork.artist_nationality %>"></p>
             <p><b>Description: </b><input type="text" name="desc" id="desc" placeholder="<%= currentArtwork.description %>"></p>
             <p><b>Media URL: </b><input type="url" name="media" id="media" onchange="change()" placeholder="<%= currentArtwork.media_url %>"></p>
             <p><b>Price: $</b><input type="number" name="price" id="price" placeholder="<%= currentArtwork.price %>"></p>
-            <div id="errors"></div>
+            <div id="errors" hidden></div>
         <div class="button-container">
             <Button type="submit" name="update" title="update" value="update">Update</Button>
         </div>

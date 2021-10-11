@@ -9,7 +9,8 @@
     <link href="/css/style.css" rel="stylesheet" type="text/css">
     <link href="/css/artwork.css" rel="stylesheet" type="text/css">
     <script>
-        function test() {
+
+        const deletes = () => {
             const xhttp = new XMLHttpRequest();
             xhttp.withCredentials = true;
             xhttp.open("DELETE", "/art/<%= currentArtwork.id %>", true);
@@ -21,8 +22,9 @@
                 }
             }
             xhttp.send();
-
         }
+
+        const update = () => window.location.href = window.location.href + "/update"
     </script>
 
 </head>
@@ -54,7 +56,10 @@
 
             <% if(admin) { %>
                 <div class="button">
-                    <Button title="Delete" value="Delete" onclick="test()">Delete</Button>
+                    <Button title="Delete" value="Delete" onclick="deletes()">Delete</Button>
+                </div>
+                <div class="button">
+                    <Button title="update" value="update" onclick="update()">Update</Button>
                 </div>
             <% } %>
         </div>

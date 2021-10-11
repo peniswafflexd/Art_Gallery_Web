@@ -63,6 +63,7 @@ class Artwork {
             author: this.author,
             description: this.description,
             purchased: this.purchased,
+            artist_nationality: this.artist_nationality,
             ...objToUpdate
         }
         this.dbController.update_document(this.id, "artworks", updateObj)
