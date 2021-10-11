@@ -105,7 +105,8 @@ const oauthCallbackSuccess = (req, res) => {
     }).catch((err) => {
         console.error(err)
     }).finally(() => {
-        res.render('pages/success',{ userData: userData });
+        res.send(userData)
+        // res.render('pages/success',{ userData: userData });
     });
 
 }
