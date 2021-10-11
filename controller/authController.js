@@ -140,6 +140,7 @@ const oauthCallbackSuccess = (req, res) => {
                         .then(user => {
                             req.session.user = user
                             console.log("creating user " + user.username)
+                            getUserGeoLocation(req).then(country => req.session.location = country)
                             return res.redirect("/")
                         }).catch(err => console.error(err));
                 }
