@@ -100,16 +100,15 @@ const oauthCallbackSuccess = (req, res) => {
         }
     }))
 
-    Promise.all(requests).then((response) => {
-        console.log(response)
-        userData = {data: response.data}
-    }).catch((err) => {
-        console.error(err)
-    }).finally(() => {
+    axios.all(requests).then((...response) => {
+        userData = {response}
         res.send(userData)
+    }).catch((err) => {
+        res.send({err: err})
+    }).finally(() => {
+        // res.send(userData)
         // res.render('pages/success',{ userData: userData });
     });
-
 }
 
 
