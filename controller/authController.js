@@ -4,6 +4,7 @@ const dbController = require('./dbController')
 const jwt = require('jwt-simple')
 const {User} = require("../model/User");
 const axios = require("axios");
+const {data} = require("express-session");
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 
 const clientID = 'c5f7827886b1acd5c1aa'
@@ -91,15 +92,22 @@ const oauthGithubCallback = (req, res) => {
 }
 
 const oauthCallbackSuccess = (req, res) => {
-    axios({
-        method: 'get',
-        url: `https://api.github.com/user`,
+    let apiURLS = [`https://api.github.com/user`,`https://api.github.com/user/emails`]
+    let userData = {};
+    let requests = apiURLS.map(url => axios.get(url, {
         headers: {
             Authorization: 'token ' + githubAccessToken
         }
-    }).then((response) => {
-        res.render('pages/success',{ userData: response.data });
-    })
+    }))
+
+    Promise.all(requests).then((response) => {
+        userData = {response, ...userData}
+    }).catch((err) => {
+        console.error(err)
+    }).finally(() => {
+        res.render('pages/success',{ userData: userData });
+    });
+
 }
 
 
