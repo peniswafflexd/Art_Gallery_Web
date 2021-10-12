@@ -7,25 +7,35 @@ const {Order} = require("../model/Order");
 
 //test
 
+const client_uri = "mongodb+srv://admin:admin1@app.g1swe.mongodb.net"
+const client = new MongoClient(client_uri);
+
+const users = 'users'
+const artworks = 'artworks'
+const orders = 'orders'
+const donations = 'donations'
+
+const db = 'NWEN304'
+
 /*Generic admin client with access with read-write access to every collection in
 the database. Should be used for debugging, rather than general use.*/
-const admin_uri = "mongodb+srv://admin:admin1@app.g1swe.mongodb.net"
-const admin = new MongoClient(admin_uri);
+//const admin_uri = "mongodb+srv://admin:admin1@app.g1swe.mongodb.net"
+//const admin = new MongoClient(admin_uri);
 
 /*Admin client for creating accounts and logging a user in. Read-Write access to
 users*/
-const login_uri = "mongodb+srv://login:login@app.g1swe.mongodb.net"
-const login_admin = new MongoClient(login_uri);
+//const login_uri = "mongodb+srv://login:login@app.g1swe.mongodb.net"
+//const login_admin = new MongoClient(login_uri);
 
 /*Admin client used to add and remove art from the artworks collection, and handle
 donations. Has read-Write access to artworks and donations, and read access to users.*/
-const art_uri = "mongodb+srv://art:art@app.g1swe.mongodb.net"
-const art_admin = new MongoClient(art_uri);
+//const art_uri = "mongodb+srv://art:art@app.g1swe.mongodb.net"
+//const art_admin = new MongoClient(art_uri);
 
 /*Admin client for handling orders and purchases. has read access to artworks and users,
 and read-write access to orders.*/
-const purchase_uri = "mongodb+srv://purchases:purchases@app.g1swe.mongodb.net"
-const purchase_admin = new MongoClient(purchase_uri);
+//const purchase_uri = "mongodb+srv://purchases:purchases@app.g1swe.mongodb.net"
+//const purchase_admin = new MongoClient(purchase_uri);
 
 const salt = "AllYourBaseRBelongToUs";
 const N = 1024, r = 8, p = 1;
@@ -48,6 +58,11 @@ function hash(password) {
 
 }
 
+async function mongoConnect() {
+  await client.connect();
+  console.log('MongoDB client connected');
+}
+
 /*Returns a json document for a given id and collection. All mongodb
 collections contain an ID column called '_id', allowing this function to return
 any document from any collection.
@@ -55,57 +70,40 @@ any document from any collection.
 ID: String form of the ID of the document being searched for
 collection: String, name of the collection the document is in
 */
-async function get(id, collection, client = admin) {
-
+async function get(id, collection) {
     try {
-
-        await client.connect();
 
         let object_id = new mongo.ObjectID(id);
-        let item = await client.db('NWEN304').collection(collection).findOne({_id: object_id});
+        let item = await client.db(db).collection(collection).findOne({_id: object_id});
 
         return item;
-
-    } finally {
-        await client.close();
-    }
-
+    } catch(e) {console.error(e)}
 }
 
-async function get_orders(order_ids, client = admin){
+async function get_orders(order_ids){
     try {
-
-        await client.connect();
         let orderArr = []
         for (const id of order_ids) {
             // console.log("order id: "+ order_id)
             let object_id = new mongo.ObjectID(id);
-            let item = await client.db('NWEN304').collection("orders").findOne({_id: object_id});
+            let item = await client.db(db).collection(orders).findOne({_id: object_id});
             console.log("order data" + JSON.stringify(item));
             orderArr.push(new Order(item))
         }
         return orderArr;
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 }
 
-async function get_donations(donation_ids, client = admin){
+async function get_donations(donation_ids){
     try {
-
-        await client.connect();
         let donationArr = []
         for (const id of donation_ids) {
             let object_id = new mongo.ObjectID(id);
-            let item = await client.db('NWEN304').collection("donations").findOne({_id: object_id});
+            let item = await client.db(db).collection(donations).findOne({_id: object_id});
             donationArr.push(item);
         }
         return donationArr;
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 }
 
 /*Returns a String consisting of the ID of the provided object. Useful as MongoDB
@@ -133,31 +131,24 @@ single: Boolean, whether the function returns a single element or an array of
 elements. Single search is faster, and should be used when only a single entry
 is expected to be in the collection that matches the query.
 */
-async function make_query(collection, query, single = false, client = admin) {
-
+async function make_query(collection, query, single = false) {
     try {
-
-        await client.connect();
-
         let result;
 
         if (single) {
-            result = await client.db("NWEN304").collection(collection).findOne(query);
+            result = await client.db(db).collection(collection).findOne(query);
         } else (
-            result = await client.db("NWEN304").collection(collection).find(query).toArray()
+            result = await client.db(db).collection(collection).find(query).toArray()
         )
 
         return (result);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
 const check_username = async (usernameToFind) => {
     const query = {username: usernameToFind}
-    const userData = await make_query("users", query, true);
+    const userData = await make_query(users, query, true);
     if(!userData?._id) return null;
     return new User(userData)
 }
@@ -173,7 +164,7 @@ ID: String form of the ID of the object to be updated
 collection: String, name of the collection the target document is in
 update: Object key-pair, new value for the document
 */
-async function update_document(id, collection, update, client = admin) {
+async function update_document(id, collection, update) {
     console.log("updating " + id + " in collection " + collection + " with; " + JSON.stringify(update));
     let object_id = new mongo.ObjectID(id);
     let query = {
@@ -181,13 +172,8 @@ async function update_document(id, collection, update, client = admin) {
     };
 
     try {
-
-        await client.connect();
-        await client.db("NWEN304").collection(collection).updateOne(query, {$set: update});
-
-    } finally {
-        await client.close();
-    }
+        await client.db(db).collection(collection).updateOne(query, {$set: update});
+    } catch(e) {console.error(e)}
 
 }
 
@@ -203,11 +189,8 @@ admin: Boolean, determines whether the account is to be an admin account,
 or a regular account
 */
 async function add_user(username, password, f_name, l_name, email, admin = false) {
-
     try {
-        await login_admin.connect();
-
-        let in_database = await login_admin.db('NWEN304').collection('users').findOne({username: username});
+        let in_database = await client.db(db).collection(users).findOne({username: username});
         if (in_database) {
             throw 'username_taken';
         } else {
@@ -223,13 +206,10 @@ async function add_user(username, password, f_name, l_name, email, admin = false
                 admin: admin
             };
 
-            await login_admin.db('NWEN304').collection('users').insertOne(new_user);
+            await client.db(db).collection(users).insertOne(new_user);
             return new User(new_user);
         }
-
-    } finally {
-        await login_admin.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -246,10 +226,7 @@ password: String, the users password
 async function user_login(username, password) {
 
     try {
-
-        await login_admin.connect();
-
-        let account = await login_admin.db('NWEN304').collection('users').findOne({username: username});
+        let account = await client.db(db).collection(users).findOne({username: username});
 
         if (account) {
 
@@ -265,10 +242,7 @@ async function user_login(username, password) {
         } else {
             throw 'username_not_found'
         }
-
-    } finally {
-        await login_admin.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -289,7 +263,7 @@ async function add_oauth_token(user_id, website, token){
 
   update[web_name] = token;
 
-  let response = await update_document(user_id, "users", update, login_admin);
+  let response = await update_document(user_id, users, update);
 
   if (response.matchedCount == 0) {
     throw 'user_not_found';
@@ -306,7 +280,7 @@ website: String, the identifier you used when you added the o-auth token.
 */
 async function get_oauth_token(user_id, website){
 
-  let response = await get(user_id, "users", login_admin);
+  let response = await get(user_id, users);
 
   if (!response) {
     throw 'user_not_found';
@@ -335,7 +309,7 @@ const update_password = (id, password) => {
         password: password_hash,
         resetKey: ""
     }
-    update_document(id, 'users', update).catch(err => console.error(err));
+    update_document(id, users, update).catch(err => console.error(err));
 }
 
 /*Adds an artwork to the collection of artworks
@@ -353,18 +327,12 @@ async function add_art(author, description, url, price) {
         price: price,
         purchased: false
     };
-
     try {
 
-        await art_admin.connect();
-
-        let artwork = await art_admin.db("NWEN304").collection("artworks").insertOne(new_art);
+        let artwork = await client.db(db).collection(artworks).insertOne(new_art);
 
         return (artwork);
-
-    } finally {
-        await art_admin.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -375,13 +343,13 @@ artwork in the collection.
 
 artwork_ids: array of Strings, the id's of the artworks to be checked.
 */
-async function check_artworks(artwork_ids, client = admin) {
+async function check_artworks(artwork_ids) {
 
     let price = 0.0;
 
     for (let id in artwork_ids) {
 
-        let art = await get(artwork_ids[id], "artworks", client);
+        let art = await get(artwork_ids[id], artworks, client);
 
         if (!art) {
             throw 'art_' + artwork_ids[id] + '_not_found';
@@ -416,14 +384,14 @@ async function add_order(user_id, artwork_ids) {
 
     try {
 
-        let user = await get(user_id, "users", purchase_admin);
+        let user = await get(user_id, users);
 
         if (!user) {
             throw 'user_not_found';
         }
 
         //artworks have probably already been checked by this point but it's safer to check again
-        let price = await check_artworks(artwork_ids, purchase_admin);
+        let price = await check_artworks(artwork_ids);
 
         let new_order = {
             user_id: user_id,
@@ -432,16 +400,10 @@ async function add_order(user_id, artwork_ids) {
         };
 
         for (let id in artwork_ids) {
-            await update_document(artwork_ids[id], "artworks", {purchased: true}, purchase_admin);
+            await update_document(artwork_ids[id], artworks, {purchased: true});
         }
-
-        await purchase_admin.connect();
-
-        await purchase_admin.db("NWEN304").collection("orders").insertOne(new_order);
-
-    } finally {
-        await purchase_admin.close();
-    }
+        await client.db(db).collection(orders).insertOne(new_order);
+    } catch(e) {console.error(e)}
 
 }
 
@@ -462,7 +424,7 @@ async function add_donation(user_id, author, description, url, price) {
 
     try {
 
-        let user = await get(user_id, "users", art_admin);
+        let user = await get(user_id, users);
 
         if (!user) {
             throw 'user_not_found';
@@ -475,15 +437,10 @@ async function add_donation(user_id, author, description, url, price) {
             user_id: user_id,
             artwork_id: artwork_id
         };
-
-        await art_admin.connect();
-
-        await art_admin.db("NWEN304").collection("donations").insertOne(new_donation);
+        await client.db(db).collection(donations).insertOne(new_donation);
 
         return artwork_id;
-    } finally {
-        await art_admin.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -498,26 +455,17 @@ async function remove_user(user_id) {
         query = {
             user_id: user_id
         }
+        await client.db(db).collection(donations).deleteMany(query);
 
-        await art_admin.connect();
-        await art_admin.db("NWEN304").collection("donations").deleteMany(query);
-
-        await purchase_admin.connect();
-        await purchase_admin.db("NWEN304").collection("orders").deleteMany(query);
+        await client.db(db).collection(orders).deleteMany(query);
 
         let object_id = new mongo.ObjectID(user_id);
         let user_query = {
             _id: object_id
         }
 
-        await login_admin.connect();
-        await login_admin.db("NWEN304").collection("users").deleteOne(user_query);
-
-    } finally {
-        await art_admin.close();
-        await purchase_admin.close();
-        await login_admin.close();
-    }
+        await client.db(db).collection(users).deleteOne(user_query);
+    } catch(e) {console.error(e)}
 
 }
 
@@ -532,12 +480,12 @@ async function remove_artwork(artwork_id) {
 
     try {
 
-        let in_donations = await make_query("donations", {artwork_id: artwork_id}, true);
+        let in_donations = await make_query(donations, {artwork_id: artwork_id}, true);
         if (in_donations) {
             throw "artwork_in_donations";
         }
 
-        let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
+        let in_orders = await make_query(orders, {artwork_id: {$elemMatch: {$eq: artwork_id}}}, true);
         if (in_orders) {
             throw "artwork_in_orders";
         }
@@ -546,13 +494,8 @@ async function remove_artwork(artwork_id) {
         query = {
             _id: object_id
         }
-
-        await art_admin.connect();
-        await art_admin.db("NWEN304").collection("artworks").deleteOne(query);
-
-    } finally {
-        await art_admin.close();
-    }
+        await client.db(db).collection(artworks).deleteOne(query);
+    } catch(e) {console.error(e)}
 
 }
 
@@ -563,7 +506,7 @@ no orders / donations, or if teh user has no orders / donations.
 ID: String ID of the artwork / user you're searchign for the donations / orders of.
 */
 async function donations_by_artwork(artwork_id){
-  let in_donations = await make_query("donations", {artwork_id: artwork_id}, false);
+  let in_donations = await make_query(donations, {artwork_id: artwork_id}, false);
 
   if (!in_donations){
     return null;
@@ -572,7 +515,7 @@ async function donations_by_artwork(artwork_id){
     return in_donations.map(donation => get_ID(donation));
 }
 async function orders_by_artwork(artwork_id){
-  let in_orders = await make_query("orders", {artwork_id: {$elemMatch: {$eq: artwork_id}}}, false);
+  let in_orders = await make_query(orders, {artwork_id: {$elemMatch: {$eq: artwork_id}}}, false);
 
   if (!in_orders){
     return null;
@@ -581,7 +524,7 @@ async function orders_by_artwork(artwork_id){
     return in_orders.map(order => get_ID(order));
 }
 async function donations_by_user(user_id){
-  let in_donations = await make_query("donations", {user_id: user_id}, false);
+  let in_donations = await make_query(donations, {user_id: user_id}, false);
 
   if (!in_donations){
     return null;
@@ -590,7 +533,7 @@ async function donations_by_user(user_id){
     return in_donations.map(donation => get_ID(donation));
 }
 async function orders_by_user(user_id){
-  let in_orders = await make_query("orders", {user_id: user_id}, false);
+  let in_orders = await make_query(orders, {user_id: user_id}, false);
 
   if (!in_orders){
     return null;
@@ -609,13 +552,8 @@ async function remove_donation(donation_id) {
     }
 
     try {
-
-        await art_admin.connect();
-        await art_admin.db("NWEN304").collection("donations").deleteOne(query);
-
-    } finally {
-        await art_admin.close();
-    }
+        await client.db(db).collection(donations).deleteOne(query);
+    } catch(e) {console.error(e)}
 
 }
 
@@ -629,13 +567,8 @@ async function remove_order(order_id) {
     }
 
     try {
-
-        await purchase_admin.connect();
-        await purchase_admin.db("NWEN304").collection("order").deleteOne(query);
-
-    } finally {
-        await purchase_admin.close();
-    }
+        await client.db(db).collection(orders).deleteOne(query);
+    } catch(e) {console.error(e)}
 
 }
 
@@ -652,7 +585,7 @@ Also just now realised the word is 'artist' not 'author'. Oops.
 */
 async function update_artwork(artwork_id, update) {
 
-    await update_document(artwork_id, "artworks", update, art_admin);
+    await update_document(artwork_id, artworks, update);
 
 }
 
@@ -660,22 +593,18 @@ async function update_artwork(artwork_id, update) {
 async function get_all_art() {
 
     try {
-
-        await art_admin.connect();
-        let artworkArray = (await art_admin.db("NWEN304").collection("artworks").find({}).toArray());
+        let artworkArray = (await client.db(db).collection(artworks).find({}).toArray());
         const newArt = artworkArray.map(art_data => new Artwork(art_data, true))
         return newArt
-    } finally {
-        await art_admin.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
 
 async function run() {
 
-    result = await donations_by_artwork("61564997cf45136ae0411a7f");
-    console.log(result);
+  result = await get_donations(['61564998cf45136ae0411a80', '6157f00de30dd1aa5b17aded']);
+  console.log(result);
 
 }
 
@@ -701,7 +630,8 @@ module.exports = {
     check_username,
     update_document,
     get,
-    update_password
+    update_password,
+    mongoConnect
 }
 
 //run().catch(console.error);
