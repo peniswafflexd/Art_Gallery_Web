@@ -3,6 +3,7 @@ const artController = require('./artController')
 const jwt = require('jwt-simple')
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
 const {User} = require("../model/User");
+const {artworkMap} = require("../model/Artwork");
 
 const getToken = (req, res) => {
     const {username, password} = req.body;
@@ -21,10 +22,12 @@ const getToken = (req, res) => {
 
 const getAllArt = (req, res) =>{
     res.contentType = "application/json";
-    dbController.get_all_art()
-        .then(artData => {
-            res.status(200).json(artData)
-        }).catch(err => res.status(500).json({err: err}))
+    // dbController.get_all_art()
+    //     .then(artData => {
+    //         res.status(200).json(artData)
+    //     }).catch(err => res.status(500).json({err: err}))
+    const artwork = [...artworkMap.values()]
+    res.status(200).json(artwork)
 }
 
 const addDonation = (req, res) => {
