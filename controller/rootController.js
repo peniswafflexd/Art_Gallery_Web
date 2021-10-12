@@ -41,11 +41,13 @@ const donate = (req, res) => {
     let artworks;
     dbController.donations_by_user(req.session.user.id)
         .then(idArr => {
-            dbController.get_donations(idArr)
-                .then(donations => {
-                    artworks = donations.map(donation => artworkMap.get(donation.artwork_id));
-                    res.render('pages/donate', {donations: artworks});
-                })
+            artworks = idArr.map(id => artworkMap.get(id))
+            res.render('pages/donate', {donations: artworks});
+            // dbController.get_donations(idArr)
+            //     .then(donations => {
+            //         artworks = donations.map(donation => artworkMap.get(donation.artwork_id));
+            //         res.render('pages/donate', {donations: artworks});
+            //     })
         })
 }
 

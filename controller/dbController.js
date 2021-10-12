@@ -529,8 +529,8 @@ async function donations_by_user(user_id){
   if (!in_donations){
     return null;
   }
-
-    return in_donations.map(donation => get_ID(donation));
+  console.log(JSON.stringify(in_donations))
+    return in_donations.map(donation => donation.artwork_id);
 }
 async function orders_by_user(user_id){
   let in_orders = await make_query(orders, {user_id: user_id}, false);
