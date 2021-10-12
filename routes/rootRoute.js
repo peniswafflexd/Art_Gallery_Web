@@ -28,7 +28,7 @@ rootRouter.get('/cart',isLoggedIn, rootController.cart);
 
 rootRouter.get('/donate', isLoggedIn, rootController.donate);
 
-rootRouter.get('/login', rootController.login);
+rootRouter.get('/login', authController.login);
 
 rootRouter.get('', rootController.root)
 

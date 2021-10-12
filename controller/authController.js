@@ -3,8 +3,14 @@ const {handleErrors, sendErrorJson, sendEmail, getUserGeoLocation} = require("..
 const dbController = require('./dbController')
 const jwt = require('jwt-simple')
 const {User} = require("../model/User");
+const axios = require("axios");
 const jwtSecret = "ThIsIsMySuP3rS3cUr3S4Lt"
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
+const clientID = 'c5f7827886b1acd5c1aa'
+const clientSecret = '2e2c0bf6ea2432e0edf8cec59445b96a55c266a3'
+
+let githubAccessToken = "";
 /**
  * Logs a user in and creates a session for them
  * also adds their location to the session for
@@ -63,6 +69,85 @@ const postSignup = (req, res) => {
 const getResetPassword = (req, res) => {
     res.render('pages/resetPasswordEmail');
 }
+
+const login = (req, res) => {
+    res.render('pages/login', {client_id: clientID});
+}
+
+const oauthGithubCallback = (req, res) => {
+    // The req.query object has the query params that were sent to this route.
+    const requestToken = req.query.code
+
+    axios({
+        method: 'post',
+        url: `https://github.com/login/oauth/access_token?client_id=${clientID}&client_secret=${clientSecret}&code=${requestToken}&scope=user`,
+        // Set the content type header, so that we get the response in JSON
+        headers: {
+            accept: 'application/json'
+        }
+    }).then((response) => {
+        githubAccessToken = response.data.access_token
+        res.redirect('/oauth/success');
+    })
+}
+
+const githubLogin = (req, res) => {
+    res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientID}&scope=user`);
+}
+
+const oauthCallbackSuccess = (req, res) => {
+    let userData = {};
+
+    axios.all([
+        axios({
+            method: 'get',
+            url: `https://api.github.com/user`,
+            // Set the content type header, so that we get the response in JSON
+            headers: {
+                accept: 'application/json',
+                Authorization: 'token ' + githubAccessToken,
+                "X-Oauth-Scope": "user:email"
+            }
+        }),
+        axios({
+            method: 'get',
+            url: `https://api.github.com/user/emails`,
+            // Set the content type header, so that we get the response in JSON
+            headers: {
+                Accept: 'application/vnd.github.v3+json, application/json',
+                Authorization: 'token ' + githubAccessToken,
+                "X-Oauth-Scope": "user:email",
+            }
+        })
+    ]).then(axios.spread((userInfo, userEmail) => {
+        userData = userInfo.data;
+        let primaryEmail;
+        userEmail.data.forEach(emailObj => {
+            if (emailObj.primary) primaryEmail = emailObj.email
+        })
+        userData.email = primaryEmail;
+        // console.log(userData)
+        return dbController.check_username(userData.login)
+            .then(userObj => {
+                if (userObj) {
+                    req.session.user = userObj;
+                    console.log("logging in " + userData.login)
+                    return res.redirect('/')
+                } else {
+                    const randomPassword = (Math.random().toString(36).slice(-8)) + new Date().getMilliseconds()
+                    const userFirstAndLast = userData.name.split(" ")
+                    return dbController.add_user(userData.login, randomPassword, userFirstAndLast[0], userFirstAndLast[1], userData.email)
+                        .then(user => {
+                            req.session.user = user
+                            console.log("creating user " + user.username)
+                            getUserGeoLocation(req).then(country => req.session.location = country)
+                            return res.redirect("/")
+                        }).catch(err => console.error(err));
+                }
+            }).catch(err => console.error(err));
+    }));
+}
+
 
 /**
  * gets the users username when resetting their
@@ -138,5 +223,9 @@ module.exports = {
     getResetPassword,
     setNewPassword,
     getNewPassword,
-    postResetPasswordEmail
+    postResetPasswordEmail,
+    login,
+    oauthGithubCallback,
+    oauthCallbackSuccess,
+    githubLogin
 }
