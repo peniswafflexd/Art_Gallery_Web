@@ -58,6 +58,11 @@ function hash(password) {
 
 }
 
+async function mongoConnect() {
+  await client.connect();
+  console.log('MongoDB client connected');
+}
+
 /*Returns a json document for a given id and collection. All mongodb
 collections contain an ID column called '_id', allowing this function to return
 any document from any collection.
@@ -66,26 +71,17 @@ ID: String form of the ID of the document being searched for
 collection: String, name of the collection the document is in
 */
 async function get(id, collection) {
-
     try {
-
-        await client.connect();
 
         let object_id = new mongo.ObjectID(id);
         let item = await client.db(db).collection(collection).findOne({_id: object_id});
 
         return item;
-
-    } finally {
-        await client.close();
-    }
-
+    } catch(e) {console.error(e)}
 }
 
 async function get_orders(order_ids){
     try {
-
-        await client.connect();
         let orderArr = []
         for (const id of order_ids) {
             // console.log("order id: "+ order_id)
@@ -95,16 +91,11 @@ async function get_orders(order_ids){
             orderArr.push(new Order(item))
         }
         return orderArr;
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 }
 
 async function get_donations(donation_ids){
     try {
-
-        await client.connect();
         let donationArr = []
         for (const id of donation_ids) {
             let object_id = new mongo.ObjectID(id);
@@ -112,10 +103,7 @@ async function get_donations(donation_ids){
             donationArr.push(item);
         }
         return donationArr;
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 }
 
 /*Returns a String consisting of the ID of the provided object. Useful as MongoDB
@@ -144,11 +132,7 @@ elements. Single search is faster, and should be used when only a single entry
 is expected to be in the collection that matches the query.
 */
 async function make_query(collection, query, single = false) {
-
     try {
-
-        await client.connect();
-
         let result;
 
         if (single) {
@@ -158,10 +142,7 @@ async function make_query(collection, query, single = false) {
         )
 
         return (result);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -191,13 +172,8 @@ async function update_document(id, collection, update) {
     };
 
     try {
-
-        await client.connect();
         await client.db(db).collection(collection).updateOne(query, {$set: update});
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -213,10 +189,7 @@ admin: Boolean, determines whether the account is to be an admin account,
 or a regular account
 */
 async function add_user(username, password, f_name, l_name, email, admin = false) {
-
     try {
-        await client.connect();
-
         let in_database = await client.db(db).collection(users).findOne({username: username});
         if (in_database) {
             throw 'username_taken';
@@ -236,10 +209,7 @@ async function add_user(username, password, f_name, l_name, email, admin = false
             await client.db(db).collection(users).insertOne(new_user);
             return new User(new_user);
         }
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -256,9 +226,6 @@ password: String, the users password
 async function user_login(username, password) {
 
     try {
-
-        await client.connect();
-
         let account = await client.db(db).collection(users).findOne({username: username});
 
         if (account) {
@@ -275,10 +242,7 @@ async function user_login(username, password) {
         } else {
             throw 'username_not_found'
         }
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -363,18 +327,12 @@ async function add_art(author, description, url, price) {
         price: price,
         purchased: false
     };
-
     try {
-
-        await client.connect();
 
         let artwork = await client.db(db).collection(artworks).insertOne(new_art);
 
         return (artwork);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -444,14 +402,8 @@ async function add_order(user_id, artwork_ids) {
         for (let id in artwork_ids) {
             await update_document(artwork_ids[id], artworks, {purchased: true});
         }
-
-        await client.connect();
-
         await client.db(db).collection(orders).insertOne(new_order);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -485,15 +437,10 @@ async function add_donation(user_id, author, description, url, price) {
             user_id: user_id,
             artwork_id: artwork_id
         };
-
-        await client.connect();
-
         await client.db(db).collection(donations).insertOne(new_donation);
 
         return artwork_id;
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -508,8 +455,6 @@ async function remove_user(user_id) {
         query = {
             user_id: user_id
         }
-
-        await client.connect();
         await client.db(db).collection(donations).deleteMany(query);
 
         await client.db(db).collection(orders).deleteMany(query);
@@ -520,10 +465,7 @@ async function remove_user(user_id) {
         }
 
         await client.db(db).collection(users).deleteOne(user_query);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -552,13 +494,8 @@ async function remove_artwork(artwork_id) {
         query = {
             _id: object_id
         }
-
-        await client.connect();
         await client.db(db).collection(artworks).deleteOne(query);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -615,13 +552,8 @@ async function remove_donation(donation_id) {
     }
 
     try {
-
-        await client.connect();
         await client.db(db).collection(donations).deleteOne(query);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -635,13 +567,8 @@ async function remove_order(order_id) {
     }
 
     try {
-
-        await client.connect();
         await client.db(db).collection(orders).deleteOne(query);
-
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -666,14 +593,10 @@ async function update_artwork(artwork_id, update) {
 async function get_all_art() {
 
     try {
-
-        await client.connect();
         let artworkArray = (await client.db(db).collection(artworks).find({}).toArray());
         const newArt = artworkArray.map(art_data => new Artwork(art_data, true))
         return newArt
-    } finally {
-        await client.close();
-    }
+    } catch(e) {console.error(e)}
 
 }
 
@@ -707,7 +630,8 @@ module.exports = {
     check_username,
     update_document,
     get,
-    update_password
+    update_password,
+    mongoConnect
 }
 
-run().catch(console.error);
+//run().catch(console.error);

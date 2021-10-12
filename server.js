@@ -5,6 +5,7 @@ const sessions = require('express-session');
 const app = express();
 module.exports = {app}
 const {get_all_art} = require("./controller/dbController");
+const {mongoConnect} = require("./controller/dbController")
 const {populateArtworkMap} = require("./controller/modelController")
 const {updateLocals} = require("./middleware/security")
 const {artRouter} = require("./routes/artRoute")
@@ -52,12 +53,12 @@ app.use("/api", apiRouter)
 
 //start the server
 app.listen((process.env.PORT || 8080), () => {
-    get_all_art().then(data => {
-        // app.locals.artwork = data
-        populateArtworkMap(data)
-        app.locals.user = {};
+    mongoConnect().then(() => {
+      get_all_art().then(data => {
+          // app.locals.artwork = data
+          populateArtworkMap(data)
+          app.locals.user = {};
+      })
     })
     console.log('Server is listening on port 8080');
 });
-
-
