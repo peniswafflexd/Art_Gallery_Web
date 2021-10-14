@@ -7,6 +7,14 @@ CRUD functionality such as, creating items, hiring items, buying items and donat
 items. 
 The database is MongoDB
 
+#### Starting
+Ensure that npm is installed on the computer.
+
+Run the Command "npm isntall" to install the dependancies for the project.
+
+To run the site locally run "npm start" and it will start on localhost:8080 and should be 
+accessible from your web browswer.
+
 ## How to use (Website)
 ### Basic overview
 The website is fairly simple, by going to [the website](https://artgallery-team7.herokuapp.com/), 
