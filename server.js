@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
 const app = express();
+const mongoSanitize = require('express-mongo-sanitize');
 module.exports = {app}
 const {get_all_art} = require("./controller/dbController");
 const {mongoConnect} = require("./controller/dbController")
@@ -18,6 +19,8 @@ const {apiRouter} = require("./routes/apiRoute");
 const {oauthRouter} = require("./routes/oauthRouter");
 // creating 20 minutes hours from milliseconds
 const TWENTY_MIN = 1000 * 60 * 20;
+
+
 
 //session middleware
 // let session;
@@ -35,6 +38,14 @@ app.use(sessions({
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+app.use(
+  mongoSanitize({
+    onSanitize: () => {
+      console.log("sanitized");
+    },
+  }),
+);
 
 // cookie parser middleware
 app.use(cookieParser());

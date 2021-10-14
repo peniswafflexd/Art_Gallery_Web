@@ -34,8 +34,15 @@ const addDonation = (req, res) => {
     return artController.postArt(req, res);
 }
 
+const jwtObject = {
+    username: User.Username,
+    id: User.Id,
+    admin: User.admin = true,
+}
+
 module.exports = {
     addDonation,
     getToken,
-    getAllArt
+    getAllArt,
+    jwtObject,
 }
