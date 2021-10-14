@@ -16,16 +16,13 @@ const getToken = (req, res) => {
             }
             const newToken = jwt.encode(payload, jwtSecret);
             res.contentType = "application/json";
-            res.status(200).json({token: newToken})
-        }).catch(err => res.send("Invalid Credentials"))
+            res.status(200)
+            res.json({token: newToken})
+        }).catch(err => res.status(500).send("Invalid Credentials"));
 }
 
 const getAllArt = (req, res) =>{
     res.contentType = "application/json";
-    // dbController.get_all_art()
-    //     .then(artData => {
-    //         res.status(200).json(artData)
-    //     }).catch(err => res.status(500).json({err: err}))
     const artwork = [...artworkMap.values()]
     res.status(200).json(artwork)
 }
@@ -34,15 +31,8 @@ const addDonation = (req, res) => {
     return artController.postArt(req, res);
 }
 
-const jwtObject = {
-    username: User.Username,
-    id: User.Id,
-    admin: User.admin = true,
-}
-
 module.exports = {
     addDonation,
     getToken,
     getAllArt,
-    jwtObject,
 }

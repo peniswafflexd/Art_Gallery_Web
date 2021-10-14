@@ -63,6 +63,11 @@ async function mongoConnect() {
   console.log('MongoDB client connected');
 }
 
+async function mongoDisconnect() {
+    await client.close();
+    console.log('MongoDB client disconnected')
+}
+
 /*Returns a json document for a given id and collection. All mongodb
 collections contain an ID column called '_id', allowing this function to return
 any document from any collection.
@@ -631,7 +636,8 @@ module.exports = {
     update_document,
     get,
     update_password,
-    mongoConnect
+    mongoConnect,
+    mongoDisconnect
 }
 
 //run().catch(console.error);

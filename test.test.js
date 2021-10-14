@@ -1,22 +1,84 @@
 const expect = require('chai').expect;
 const {User} = require("./model/User");
+const jwt = require('jwt-simple')
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const {app} = require("./server");
 
-// const MockExpressRequest = require('mock-express-request')
-// const sinon = require('sinon')
+// Configure chai
+chai.use(chaiHttp);
+chai.should();
+before(async () => await mongoConnect())
+after(async () => await mongoDisconnect())
 
-// const {authorize} = require('/middleware/security')
+let assert = require('assert')
+const {mongoConnect, mongoDisconnect} = require("./controller/dbController");
 
-const {jwtObject} = require('./controller/apiController.js');
-
-describe('jwtObject', () => {
-    it('Is an admin JWT, should be an object with a username, an Id and is admin equal to true', ()=> {
-        expect(jwtObject).to.be.an(User.username);//username
-        expect(jwtObject).to.be.an(User.id);//id
-        expect(jwtObject).to.be.equal(true);//isadmin-boolean
+/**
+ * check that if using admin credentials then get admin jwt token
+ */
+describe("Admin Auth Token", () => {
+    describe("POST /api/new-token", () => {
+        it("Should return a new admin token", (done) => {
+            chai.request(app)
+                .post('/api/new-token')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .send({username: 'testAdmin', password: 'testAdmin'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('token')
+                    const token = res.body.token
+                    const payload = jwt.decode(token, 'nosecret', true);
+                    payload.should.have.property('id');
+                    payload.should.have.property('username')
+                    payload.should.have.property('admin')
+                    payload.admin.should.equal(true)
+                    done();
+                });
+        });
     })
-});
+})
 
-// var assert = require('assert');
-// it('should return true',() =>{
-// assert.equal(true,true)
-// })
+
+/**
+ * check that if using non-admin credentials then get non-admin jwt token
+ */
+describe("Non-Admin Auth Token", () => {
+    describe("POST /api/new-token", () => {
+        it("Should return a new non-admin token", (done) => {
+            chai.request(app)
+                .post('/api/new-token')
+                .set('content-type', 'application/x-www-form-urlencoded')
+                .send({username: 'nonAdmin', password: 'nonAdmin'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.have.property('token')
+                    const token = res.body.token
+                    const payload = jwt.decode(token, 'nosecret', true);
+                    payload.should.have.property('id');
+                    payload.should.have.property('username')
+                    payload.should.have.property('admin')
+                    payload.admin.should.equal(false)
+                    done();
+                });
+        });
+    })
+})
+
+/**
+ * Check that an array of art is returned
+ */
+describe("Get All Art", () => {
+    describe("GET /api/art", () => {
+        it("Should return a JSON array of art", (done) => {
+            chai.request(app)
+                .get('/api/art')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    expect(res.body.map(e=>(e.author))).to.include("Devon");
+                    expect(res.body.length).to.be.gt(10)
+                    done();
+                });
+        });
+    })
+})
