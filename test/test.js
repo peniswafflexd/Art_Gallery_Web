@@ -1,9 +1,9 @@
 const expect = require('chai').expect;
-const {User} = require("./model/User");
+const {User} = require("../model/User");
 const jwt = require('jwt-simple')
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const {app} = require("./server");
+const {app} = require("../server");
 
 // Configure chai
 chai.use(chaiHttp);
@@ -12,7 +12,7 @@ before(async () => await mongoConnect())
 after(async () => await mongoDisconnect())
 
 let assert = require('assert')
-const {mongoConnect, mongoDisconnect} = require("./controller/dbController");
+const {mongoConnect, mongoDisconnect} = require("../controller/dbController");
 
 /**
  * check that if using admin credentials then get admin jwt token
