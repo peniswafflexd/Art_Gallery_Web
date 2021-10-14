@@ -18,7 +18,7 @@ const getToken = (req, res) => {
             res.contentType = "application/json";
             res.status(200)
             res.json({token: newToken})
-        }).catch(err => res.status(500).send("Invalid Credentials"));
+        }).catch(err => res.status(422).send("Invalid Credentials"));
 }
 
 const getAllArt = (req, res) =>{
